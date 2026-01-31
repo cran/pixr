@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>Data Analysis Examples</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Data Analysis Examples</h1>
+
+
+
+<p>This article demonstrates practical data analysis examples using pixr
+to explore PIX adoption and usage patterns in Brazil.</p>
+<div id="setup" class="section level2">
+<h2>Setup</h2>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(pixr)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="fu">library</span>(tidyr)</span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a><span class="fu">library</span>(scales)</span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a><span class="co"># Set theme for all plots</span></span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a><span class="fu">theme_set</span>(<span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>))</span></code></pre></div>
+</div>
+<div id="example-1-pix-keys-market-share" class="section level2">
+<h2>Example 1: PIX Keys Market Share</h2>
+<p>Analyze which financial institutions dominate the PIX keys
+market:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="co"># Get PIX keys data for December 2025</span></span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="co"># Note: date uses YYYY-MM-DD format</span></span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>keys <span class="ot">&lt;-</span> <span class="fu">get_pix_keys</span>(<span class="at">date =</span> <span class="st">&quot;2025-12-01&quot;</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a><span class="co"># Get summary by institution (top 20)</span></span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>top_institutions <span class="ot">&lt;-</span> <span class="fu">get_pix_keys_summary</span>(<span class="at">date =</span> <span class="st">&quot;2025-12-01&quot;</span>, <span class="at">n_top =</span> <span class="dv">20</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="co"># Visualize top 10</span></span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>top_institutions <span class="sc">|&gt;</span></span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a>  <span class="fu">slice_head</span>(<span class="at">n =</span> <span class="dv">10</span>) <span class="sc">|&gt;</span></span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Nome =</span> forcats<span class="sc">::</span><span class="fu">fct_reorder</span>(Nome, total_keys)) <span class="sc">|&gt;</span></span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> total_keys <span class="sc">/</span> <span class="fl">1e6</span>, <span class="at">y =</span> Nome)) <span class="sc">+</span></span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">fill =</span> <span class="st">&quot;#008060&quot;</span>) <span class="sc">+</span></span>
+<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a>  <span class="fu">geom_text</span>(</span>
+<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">sprintf</span>(<span class="st">&quot;%.1fM&quot;</span>, total_keys <span class="sc">/</span> <span class="fl">1e6</span>)),</span>
+<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a>    <span class="at">hjust =</span> <span class="sc">-</span><span class="fl">0.1</span>, <span class="at">size =</span> <span class="dv">3</span></span>
+<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(</span>
+<span id="cb2-19"><a href="#cb2-19" tabindex="-1"></a>    <span class="at">labels =</span> scales<span class="sc">::</span><span class="fu">number_format</span>(<span class="at">suffix =</span> <span class="st">&quot;M&quot;</span>),</span>
+<span id="cb2-20"><a href="#cb2-20" tabindex="-1"></a>    <span class="at">expand =</span> <span class="fu">expansion</span>(<span class="at">mult =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.15</span>))</span>
+<span id="cb2-21"><a href="#cb2-21" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb2-22"><a href="#cb2-22" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb2-23"><a href="#cb2-23" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">&quot;Top 10 PIX Participants by Registered Keys&quot;</span>,</span>
+<span id="cb2-24"><a href="#cb2-24" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">&quot;December 2025&quot;</span>,</span>
+<span id="cb2-25"><a href="#cb2-25" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">&quot;Total Keys (Millions)&quot;</span>,</span>
+<span id="cb2-26"><a href="#cb2-26" tabindex="-1"></a>    <span class="at">y =</span> <span class="cn">NULL</span>,</span>
+<span id="cb2-27"><a href="#cb2-27" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">&quot;Source: Brazilian Central Bank Open Data&quot;</span></span>
+<span id="cb2-28"><a href="#cb2-28" tabindex="-1"></a>  )</span></code></pre></div>
+</div>
+<div id="example-2-key-type-distribution" class="section level2">
+<h2>Example 2: Key Type Distribution</h2>
+<p>Analyze which types of PIX keys are most popular:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="co"># Get keys data and aggregate by type</span></span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>keys <span class="ot">&lt;-</span> <span class="fu">get_pix_keys</span>(<span class="at">date =</span> <span class="st">&quot;2025-12-01&quot;</span>)</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="co"># Summarize by key type</span></span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>key_summary <span class="ot">&lt;-</span> <span class="fu">get_pix_keys_by_type</span>(<span class="at">date =</span> <span class="st">&quot;2025-12-01&quot;</span>)</span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="co"># Calculate percentages</span></span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a>key_summary <span class="ot">&lt;-</span> key_summary <span class="sc">|&gt;</span></span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a>    <span class="at">percentage =</span> total_keys <span class="sc">/</span> <span class="fu">sum</span>(total_keys) <span class="sc">*</span> <span class="dv">100</span></span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a>  )</span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a></span>
+<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a><span class="co"># Visualize</span></span>
+<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a><span class="fu">ggplot</span>(key_summary, <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(TipoChave, <span class="sc">-</span>total_keys), <span class="at">y =</span> total_keys <span class="sc">/</span> <span class="fl">1e6</span>, <span class="at">fill =</span> NaturezaUsuario)) <span class="sc">+</span></span>
+<span id="cb3-15"><a href="#cb3-15" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">position =</span> <span class="st">&quot;stack&quot;</span>) <span class="sc">+</span></span>
+<span id="cb3-16"><a href="#cb3-16" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">labels =</span> scales<span class="sc">::</span><span class="fu">number_format</span>(<span class="at">suffix =</span> <span class="st">&quot;M&quot;</span>)) <span class="sc">+</span></span>
+<span id="cb3-17"><a href="#cb3-17" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;PF&quot;</span> <span class="ot">=</span> <span class="st">&quot;#008060&quot;</span>, <span class="st">&quot;PJ&quot;</span> <span class="ot">=</span> <span class="st">&quot;#1e88e5&quot;</span>)) <span class="sc">+</span></span>
+<span id="cb3-18"><a href="#cb3-18" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb3-19"><a href="#cb3-19" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">&quot;PIX Keys by Type&quot;</span>,</span>
+<span id="cb3-20"><a href="#cb3-20" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">&quot;December 2025&quot;</span>,</span>
+<span id="cb3-21"><a href="#cb3-21" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">&quot;Key Type&quot;</span>,</span>
+<span id="cb3-22"><a href="#cb3-22" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">&quot;Total Keys (Millions)&quot;</span>,</span>
+<span id="cb3-23"><a href="#cb3-23" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">&quot;User Type&quot;</span>,</span>
+<span id="cb3-24"><a href="#cb3-24" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">&quot;Source: Brazilian Central Bank Open Data&quot;</span></span>
+<span id="cb3-25"><a href="#cb3-25" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb3-26"><a href="#cb3-26" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;bottom&quot;</span>)</span></code></pre></div>
+</div>
+<div id="example-3-regional-transaction-analysis" class="section level2">
+<h2>Example 3: Regional Transaction Analysis</h2>
+<p>Analyze PIX usage patterns across Brazilian regions:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="co"># Get transactions by region</span></span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="co"># Note: database uses YYYYMM format</span></span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>region_data <span class="ot">&lt;-</span> <span class="fu">get_pix_transactions_by_region</span>(<span class="at">database =</span> <span class="st">&quot;202512&quot;</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a><span class="co"># Visualize total value by region</span></span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>region_data <span class="sc">|&gt;</span></span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a>    <span class="at">total_value_billions =</span> (vl_pagador_pf <span class="sc">+</span> vl_pagador_pj) <span class="sc">/</span> <span class="fl">1e9</span></span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(Regiao, total_value_billions), <span class="at">y =</span> total_value_billions)) <span class="sc">+</span></span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">fill =</span> <span class="st">&quot;#008060&quot;</span>) <span class="sc">+</span></span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">labels =</span> scales<span class="sc">::</span><span class="fu">number_format</span>(<span class="at">prefix =</span> <span class="st">&quot;R$ &quot;</span>, <span class="at">suffix =</span> <span class="st">&quot;B&quot;</span>)) <span class="sc">+</span></span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">&quot;PIX Transaction Volume by Region&quot;</span>,</span>
+<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">&quot;December 2025&quot;</span>,</span>
+<span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a>    <span class="at">x =</span> <span class="cn">NULL</span>,</span>
+<span id="cb4-18"><a href="#cb4-18" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">&quot;Transaction Value (Billions BRL)&quot;</span>,</span>
+<span id="cb4-19"><a href="#cb4-19" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">&quot;Source: Brazilian Central Bank Open Data&quot;</span></span>
+<span id="cb4-20"><a href="#cb4-20" tabindex="-1"></a>  )</span></code></pre></div>
+</div>
+<div id="example-4-state-level-analysis" class="section level2">
+<h2>Example 4: State-Level Analysis</h2>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="co"># Get transactions by state</span></span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>state_data <span class="ot">&lt;-</span> <span class="fu">get_pix_transactions_by_state</span>(<span class="at">database =</span> <span class="st">&quot;202512&quot;</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="co"># Top 10 states by transaction count</span></span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>state_data <span class="sc">|&gt;</span></span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a>    <span class="at">total_count =</span> qt_pagador_pf <span class="sc">+</span> qt_pagador_pj</span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a>  <span class="fu">slice_head</span>(<span class="at">n =</span> <span class="dv">10</span>) <span class="sc">|&gt;</span></span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Estado =</span> forcats<span class="sc">::</span><span class="fu">fct_reorder</span>(Estado, total_count)) <span class="sc">|&gt;</span></span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> total_count <span class="sc">/</span> <span class="fl">1e6</span>, <span class="at">y =</span> Estado)) <span class="sc">+</span></span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">fill =</span> <span class="st">&quot;#1e88e5&quot;</span>) <span class="sc">+</span></span>
+<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">labels =</span> scales<span class="sc">::</span><span class="fu">number_format</span>(<span class="at">suffix =</span> <span class="st">&quot;M&quot;</span>)) <span class="sc">+</span></span>
+<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">&quot;Top 10 States by PIX Transaction Count&quot;</span>,</span>
+<span id="cb5-16"><a href="#cb5-16" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">&quot;December 2025&quot;</span>,</span>
+<span id="cb5-17"><a href="#cb5-17" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">&quot;Transactions (Millions)&quot;</span>,</span>
+<span id="cb5-18"><a href="#cb5-18" tabindex="-1"></a>    <span class="at">y =</span> <span class="cn">NULL</span>,</span>
+<span id="cb5-19"><a href="#cb5-19" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">&quot;Source: Brazilian Central Bank Open Data&quot;</span></span>
+<span id="cb5-20"><a href="#cb5-20" tabindex="-1"></a>  )</span></code></pre></div>
+</div>
+<div id="example-5-transaction-nature-analysis" class="section level2">
+<h2>Example 5: Transaction Nature Analysis</h2>
+<p>Analyze transactions by nature (P2P, P2B, B2B, etc.):</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="co"># Get summary by transaction nature</span></span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>nature_summary <span class="ot">&lt;-</span> <span class="fu">get_pix_summary</span>(<span class="at">database =</span> <span class="st">&quot;202509&quot;</span>, <span class="at">group_by =</span> <span class="st">&quot;NATUREZA&quot;</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a><span class="co"># Visualize</span></span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>nature_summary <span class="sc">|&gt;</span></span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(NATUREZA, <span class="sc">-</span>total_value), <span class="at">y =</span> total_value <span class="sc">/</span> <span class="fl">1e12</span>)) <span class="sc">+</span></span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">fill =</span> <span class="st">&quot;#008060&quot;</span>) <span class="sc">+</span></span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a>  <span class="fu">geom_text</span>(</span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">sprintf</span>(<span class="st">&quot;R$ %.1fT&quot;</span>, total_value <span class="sc">/</span> <span class="fl">1e12</span>)),</span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a>    <span class="at">vjust =</span> <span class="sc">-</span><span class="fl">0.5</span>, <span class="at">size =</span> <span class="dv">3</span></span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(</span>
+<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a>    <span class="at">labels =</span> scales<span class="sc">::</span><span class="fu">number_format</span>(<span class="at">prefix =</span> <span class="st">&quot;R$ &quot;</span>, <span class="at">suffix =</span> <span class="st">&quot;T&quot;</span>),</span>
+<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a>    <span class="at">expand =</span> <span class="fu">expansion</span>(<span class="at">mult =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.15</span>))</span>
+<span id="cb6-15"><a href="#cb6-15" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb6-16"><a href="#cb6-16" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb6-17"><a href="#cb6-17" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">&quot;PIX Transaction Value by Nature&quot;</span>,</span>
+<span id="cb6-18"><a href="#cb6-18" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">&quot;September 2025 - P2P: Person to Person, P2B: Person to Business, etc.&quot;</span>,</span>
+<span id="cb6-19"><a href="#cb6-19" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">&quot;Transaction Nature&quot;</span>,</span>
+<span id="cb6-20"><a href="#cb6-20" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">&quot;Total Value (Trillions BRL)&quot;</span>,</span>
+<span id="cb6-21"><a href="#cb6-21" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">&quot;Source: Brazilian Central Bank Open Data&quot;</span></span>
+<span id="cb6-22"><a href="#cb6-22" tabindex="-1"></a>  )</span></code></pre></div>
+</div>
+<div id="example-6-filtering-transactions-by-state" class="section level2">
+<h2>Example 6: Filtering Transactions by State</h2>
+<p>Use OData filters to analyze specific states:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="co"># Get transactions for Maranhão only using filter</span></span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>maranhao <span class="ot">&lt;-</span> <span class="fu">get_pix_transactions_by_municipality</span>(</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>  <span class="at">database =</span> <span class="st">&quot;202512&quot;</span>,</span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>  <span class="at">filter =</span> <span class="st">&quot;Estado eq &#39;MARANHÃO&#39;&quot;</span>,</span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>  <span class="at">orderby =</span> <span class="st">&quot;VL_PagadorPF desc&quot;</span></span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a>)</span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a><span class="co"># Top 10 municipalities by value</span></span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a>maranhao <span class="sc">|&gt;</span></span>
+<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a>  <span class="fu">slice_head</span>(<span class="at">n =</span> <span class="dv">10</span>) <span class="sc">|&gt;</span></span>
+<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(Municipio, VL_PagadorPF), <span class="at">y =</span> VL_PagadorPF <span class="sc">/</span> <span class="fl">1e6</span>)) <span class="sc">+</span></span>
+<span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">fill =</span> <span class="st">&quot;#008060&quot;</span>) <span class="sc">+</span></span>
+<span id="cb7-13"><a href="#cb7-13" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb7-14"><a href="#cb7-14" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">labels =</span> scales<span class="sc">::</span><span class="fu">number_format</span>(<span class="at">prefix =</span> <span class="st">&quot;R$ &quot;</span>, <span class="at">suffix =</span> <span class="st">&quot;M&quot;</span>)) <span class="sc">+</span></span>
+<span id="cb7-15"><a href="#cb7-15" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb7-16"><a href="#cb7-16" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">&quot;Top 10 Municipalities in Maranhão by PIX Value&quot;</span>,</span>
+<span id="cb7-17"><a href="#cb7-17" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">&quot;December 2025 - Individual payers&quot;</span>,</span>
+<span id="cb7-18"><a href="#cb7-18" tabindex="-1"></a>    <span class="at">x =</span> <span class="cn">NULL</span>,</span>
+<span id="cb7-19"><a href="#cb7-19" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">&quot;Transaction Value (Millions BRL)&quot;</span>,</span>
+<span id="cb7-20"><a href="#cb7-20" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">&quot;Source: Brazilian Central Bank Open Data&quot;</span></span>
+<span id="cb7-21"><a href="#cb7-21" tabindex="-1"></a>  )</span></code></pre></div>
+</div>
+<div id="example-7-comparing-regions-with-filters" class="section level2">
+<h2>Example 7: Comparing Regions with Filters</h2>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="co"># Get Northeast transactions using filter</span></span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>nordeste <span class="ot">&lt;-</span> <span class="fu">get_pix_transaction_stats</span>(</span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>  <span class="at">database =</span> <span class="st">&quot;202509&quot;</span>,</span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>  <span class="at">filter =</span> <span class="st">&quot;PAG_REGIAO eq &#39;NORDESTE&#39;&quot;</span></span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a>    <span class="at">total_value =</span> <span class="fu">sum</span>(VALOR, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a>    <span class="at">total_count =</span> <span class="fu">sum</span>(QUANTIDADE, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">region =</span> <span class="st">&quot;NORDESTE&quot;</span>)</span>
+<span id="cb8-11"><a href="#cb8-11" tabindex="-1"></a></span>
+<span id="cb8-12"><a href="#cb8-12" tabindex="-1"></a><span class="co"># Get Southeast transactions</span></span>
+<span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a>sudeste <span class="ot">&lt;-</span> <span class="fu">get_pix_transaction_stats</span>(</span>
+<span id="cb8-14"><a href="#cb8-14" tabindex="-1"></a>  <span class="at">database =</span> <span class="st">&quot;202509&quot;</span>,</span>
+<span id="cb8-15"><a href="#cb8-15" tabindex="-1"></a>  <span class="at">filter =</span> <span class="st">&quot;PAG_REGIAO eq &#39;SUDESTE&#39;&quot;</span></span>
+<span id="cb8-16"><a href="#cb8-16" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb8-17"><a href="#cb8-17" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb8-18"><a href="#cb8-18" tabindex="-1"></a>    <span class="at">total_value =</span> <span class="fu">sum</span>(VALOR, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb8-19"><a href="#cb8-19" tabindex="-1"></a>    <span class="at">total_count =</span> <span class="fu">sum</span>(QUANTIDADE, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb8-20"><a href="#cb8-20" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb8-21"><a href="#cb8-21" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">region =</span> <span class="st">&quot;SUDESTE&quot;</span>)</span>
+<span id="cb8-22"><a href="#cb8-22" tabindex="-1"></a></span>
+<span id="cb8-23"><a href="#cb8-23" tabindex="-1"></a><span class="co"># Combine and compare</span></span>
+<span id="cb8-24"><a href="#cb8-24" tabindex="-1"></a>comparison <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(nordeste, sudeste)</span>
+<span id="cb8-25"><a href="#cb8-25" tabindex="-1"></a></span>
+<span id="cb8-26"><a href="#cb8-26" tabindex="-1"></a>comparison <span class="sc">|&gt;</span></span>
+<span id="cb8-27"><a href="#cb8-27" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">c</span>(total_value, total_count), <span class="at">names_to =</span> <span class="st">&quot;metric&quot;</span>, <span class="at">values_to =</span> <span class="st">&quot;value&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb8-28"><a href="#cb8-28" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> region, <span class="at">y =</span> value, <span class="at">fill =</span> metric)) <span class="sc">+</span></span>
+<span id="cb8-29"><a href="#cb8-29" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">position =</span> <span class="st">&quot;dodge&quot;</span>) <span class="sc">+</span></span>
+<span id="cb8-30"><a href="#cb8-30" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>metric, <span class="at">scales =</span> <span class="st">&quot;free_y&quot;</span>) <span class="sc">+</span></span>
+<span id="cb8-31"><a href="#cb8-31" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb8-32"><a href="#cb8-32" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">&quot;Northeast vs Southeast PIX Comparison&quot;</span>,</span>
+<span id="cb8-33"><a href="#cb8-33" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">&quot;September 2025&quot;</span>,</span>
+<span id="cb8-34"><a href="#cb8-34" tabindex="-1"></a>    <span class="at">x =</span> <span class="cn">NULL</span>,</span>
+<span id="cb8-35"><a href="#cb8-35" tabindex="-1"></a>    <span class="at">y =</span> <span class="cn">NULL</span></span>
+<span id="cb8-36"><a href="#cb8-36" tabindex="-1"></a>  )</span></code></pre></div>
+</div>
+<div id="example-8-p2p-vs-p2b-analysis" class="section level2">
+<h2>Example 8: P2P vs P2B Analysis</h2>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="co"># Get P2P transactions</span></span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>p2p <span class="ot">&lt;-</span> <span class="fu">get_pix_transaction_stats</span>(</span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>  <span class="at">database =</span> <span class="st">&quot;202509&quot;</span>,</span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a>  <span class="at">filter =</span> <span class="st">&quot;NATUREZA eq &#39;P2P&#39;&quot;</span></span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a>  <span class="fu">group_by</span>(PAG_REGIAO) <span class="sc">|&gt;</span></span>
+<span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">value =</span> <span class="fu">sum</span>(VALOR, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb9-8"><a href="#cb9-8" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">type =</span> <span class="st">&quot;P2P&quot;</span>)</span>
+<span id="cb9-9"><a href="#cb9-9" tabindex="-1"></a></span>
+<span id="cb9-10"><a href="#cb9-10" tabindex="-1"></a><span class="co"># Get P2B transactions</span></span>
+<span id="cb9-11"><a href="#cb9-11" tabindex="-1"></a>p2b <span class="ot">&lt;-</span> <span class="fu">get_pix_transaction_stats</span>(</span>
+<span id="cb9-12"><a href="#cb9-12" tabindex="-1"></a>  <span class="at">database =</span> <span class="st">&quot;202509&quot;</span>,</span>
+<span id="cb9-13"><a href="#cb9-13" tabindex="-1"></a>  <span class="at">filter =</span> <span class="st">&quot;NATUREZA eq &#39;P2B&#39;&quot;</span></span>
+<span id="cb9-14"><a href="#cb9-14" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb9-15"><a href="#cb9-15" tabindex="-1"></a>  <span class="fu">group_by</span>(PAG_REGIAO) <span class="sc">|&gt;</span></span>
+<span id="cb9-16"><a href="#cb9-16" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">value =</span> <span class="fu">sum</span>(VALOR, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb9-17"><a href="#cb9-17" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">type =</span> <span class="st">&quot;P2B&quot;</span>)</span>
+<span id="cb9-18"><a href="#cb9-18" tabindex="-1"></a></span>
+<span id="cb9-19"><a href="#cb9-19" tabindex="-1"></a><span class="co"># Combine</span></span>
+<span id="cb9-20"><a href="#cb9-20" tabindex="-1"></a>combined <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(p2p, p2b)</span>
+<span id="cb9-21"><a href="#cb9-21" tabindex="-1"></a></span>
+<span id="cb9-22"><a href="#cb9-22" tabindex="-1"></a><span class="co"># Visualize</span></span>
+<span id="cb9-23"><a href="#cb9-23" tabindex="-1"></a><span class="fu">ggplot</span>(combined, <span class="fu">aes</span>(<span class="at">x =</span> PAG_REGIAO, <span class="at">y =</span> value <span class="sc">/</span> <span class="fl">1e12</span>, <span class="at">fill =</span> type)) <span class="sc">+</span></span>
+<span id="cb9-24"><a href="#cb9-24" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">position =</span> <span class="st">&quot;dodge&quot;</span>) <span class="sc">+</span></span>
+<span id="cb9-25"><a href="#cb9-25" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;P2P&quot;</span> <span class="ot">=</span> <span class="st">&quot;#008060&quot;</span>, <span class="st">&quot;P2B&quot;</span> <span class="ot">=</span> <span class="st">&quot;#1e88e5&quot;</span>)) <span class="sc">+</span></span>
+<span id="cb9-26"><a href="#cb9-26" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">labels =</span> scales<span class="sc">::</span><span class="fu">number_format</span>(<span class="at">prefix =</span> <span class="st">&quot;R$ &quot;</span>, <span class="at">suffix =</span> <span class="st">&quot;T&quot;</span>)) <span class="sc">+</span></span>
+<span id="cb9-27"><a href="#cb9-27" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb9-28"><a href="#cb9-28" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">&quot;P2P vs P2B Transactions by Region&quot;</span>,</span>
+<span id="cb9-29"><a href="#cb9-29" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">&quot;September 2025&quot;</span>,</span>
+<span id="cb9-30"><a href="#cb9-30" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">&quot;Payer Region&quot;</span>,</span>
+<span id="cb9-31"><a href="#cb9-31" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">&quot;Transaction Value (Trillions BRL)&quot;</span>,</span>
+<span id="cb9-32"><a href="#cb9-32" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">&quot;Transaction Type&quot;</span>,</span>
+<span id="cb9-33"><a href="#cb9-33" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">&quot;Source: Brazilian Central Bank Open Data&quot;</span></span>
+<span id="cb9-34"><a href="#cb9-34" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb9-35"><a href="#cb9-35" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;bottom&quot;</span>)</span></code></pre></div>
+</div>
+<div id="example-9-multiple-months-analysis" class="section level2">
+<h2>Example 9: Multiple Months Analysis</h2>
+<p>Fetch data for multiple months and analyze trends:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="co"># Get Q3 2025 data</span></span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>q3_data <span class="ot">&lt;-</span> <span class="fu">get_pix_transaction_stats_multi</span>(</span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a>  <span class="at">databases =</span> <span class="fu">c</span>(<span class="st">&quot;202507&quot;</span>, <span class="st">&quot;202508&quot;</span>, <span class="st">&quot;202509&quot;</span>)</span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a>)</span>
+<span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a></span>
+<span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a><span class="co"># Aggregate by month and nature</span></span>
+<span id="cb10-7"><a href="#cb10-7" tabindex="-1"></a>monthly_nature <span class="ot">&lt;-</span> q3_data <span class="sc">|&gt;</span></span>
+<span id="cb10-8"><a href="#cb10-8" tabindex="-1"></a>  <span class="fu">group_by</span>(AnoMes, NATUREZA) <span class="sc">|&gt;</span></span>
+<span id="cb10-9"><a href="#cb10-9" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb10-10"><a href="#cb10-10" tabindex="-1"></a>    <span class="at">total_value =</span> <span class="fu">sum</span>(VALOR, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb10-11"><a href="#cb10-11" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">&quot;drop&quot;</span></span>
+<span id="cb10-12"><a href="#cb10-12" tabindex="-1"></a>  )</span>
+<span id="cb10-13"><a href="#cb10-13" tabindex="-1"></a></span>
+<span id="cb10-14"><a href="#cb10-14" tabindex="-1"></a><span class="co"># Visualize trends</span></span>
+<span id="cb10-15"><a href="#cb10-15" tabindex="-1"></a><span class="fu">ggplot</span>(monthly_nature, <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">factor</span>(AnoMes), <span class="at">y =</span> total_value <span class="sc">/</span> <span class="fl">1e12</span>, <span class="at">fill =</span> NATUREZA)) <span class="sc">+</span></span>
+<span id="cb10-16"><a href="#cb10-16" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">position =</span> <span class="st">&quot;stack&quot;</span>) <span class="sc">+</span></span>
+<span id="cb10-17"><a href="#cb10-17" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">labels =</span> scales<span class="sc">::</span><span class="fu">number_format</span>(<span class="at">prefix =</span> <span class="st">&quot;R$ &quot;</span>, <span class="at">suffix =</span> <span class="st">&quot;T&quot;</span>)) <span class="sc">+</span></span>
+<span id="cb10-18"><a href="#cb10-18" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb10-19"><a href="#cb10-19" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">&quot;PIX Transaction Value by Nature - Q3 2025&quot;</span>,</span>
+<span id="cb10-20"><a href="#cb10-20" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">&quot;Month&quot;</span>,</span>
+<span id="cb10-21"><a href="#cb10-21" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">&quot;Transaction Value (Trillions BRL)&quot;</span>,</span>
+<span id="cb10-22"><a href="#cb10-22" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">&quot;Nature&quot;</span>,</span>
+<span id="cb10-23"><a href="#cb10-23" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">&quot;Source: Brazilian Central Bank Open Data&quot;</span></span>
+<span id="cb10-24"><a href="#cb10-24" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb10-25"><a href="#cb10-25" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;bottom&quot;</span>)</span></code></pre></div>
+</div>
+<div id="example-10-initiation-method-analysis" class="section level2">
+<h2>Example 10: Initiation Method Analysis</h2>
+<p>Analyze how PIX transactions are initiated:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="co"># Get summary by initiation method</span></span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a>method_summary <span class="ot">&lt;-</span> <span class="fu">get_pix_summary</span>(<span class="at">database =</span> <span class="st">&quot;202509&quot;</span>, <span class="at">group_by =</span> <span class="st">&quot;FORMAINICIACAO&quot;</span>)</span>
+<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a><span class="co"># Add labels</span></span>
+<span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a>method_labels <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb11-6"><a href="#cb11-6" tabindex="-1"></a>  <span class="st">&quot;DICT&quot;</span> <span class="ot">=</span> <span class="st">&quot;PIX Key&quot;</span>,</span>
+<span id="cb11-7"><a href="#cb11-7" tabindex="-1"></a>  <span class="st">&quot;QRDN&quot;</span> <span class="ot">=</span> <span class="st">&quot;Dynamic QR&quot;</span>,</span>
+<span id="cb11-8"><a href="#cb11-8" tabindex="-1"></a>  <span class="st">&quot;QRES&quot;</span> <span class="ot">=</span> <span class="st">&quot;Static QR&quot;</span>,</span>
+<span id="cb11-9"><a href="#cb11-9" tabindex="-1"></a>  <span class="st">&quot;MANU&quot;</span> <span class="ot">=</span> <span class="st">&quot;Manual&quot;</span>,</span>
+<span id="cb11-10"><a href="#cb11-10" tabindex="-1"></a>  <span class="st">&quot;INIC&quot;</span> <span class="ot">=</span> <span class="st">&quot;Initiator&quot;</span></span>
+<span id="cb11-11"><a href="#cb11-11" tabindex="-1"></a>)</span>
+<span id="cb11-12"><a href="#cb11-12" tabindex="-1"></a></span>
+<span id="cb11-13"><a href="#cb11-13" tabindex="-1"></a>method_summary <span class="sc">|&gt;</span></span>
+<span id="cb11-14"><a href="#cb11-14" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb11-15"><a href="#cb11-15" tabindex="-1"></a>    <span class="at">method_label =</span> method_labels[FORMAINICIACAO],</span>
+<span id="cb11-16"><a href="#cb11-16" tabindex="-1"></a>    <span class="at">percentage =</span> total_count <span class="sc">/</span> <span class="fu">sum</span>(total_count) <span class="sc">*</span> <span class="dv">100</span></span>
+<span id="cb11-17"><a href="#cb11-17" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb11-18"><a href="#cb11-18" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(method_label, <span class="sc">-</span>total_count), <span class="at">y =</span> total_count <span class="sc">/</span> <span class="fl">1e9</span>)) <span class="sc">+</span></span>
+<span id="cb11-19"><a href="#cb11-19" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">fill =</span> <span class="st">&quot;#008060&quot;</span>) <span class="sc">+</span></span>
+<span id="cb11-20"><a href="#cb11-20" tabindex="-1"></a>  <span class="fu">geom_text</span>(</span>
+<span id="cb11-21"><a href="#cb11-21" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">sprintf</span>(<span class="st">&quot;%.1f%%&quot;</span>, percentage)),</span>
+<span id="cb11-22"><a href="#cb11-22" tabindex="-1"></a>    <span class="at">vjust =</span> <span class="sc">-</span><span class="fl">0.5</span>, <span class="at">size =</span> <span class="dv">3</span></span>
+<span id="cb11-23"><a href="#cb11-23" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb11-24"><a href="#cb11-24" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(</span>
+<span id="cb11-25"><a href="#cb11-25" tabindex="-1"></a>    <span class="at">labels =</span> scales<span class="sc">::</span><span class="fu">number_format</span>(<span class="at">suffix =</span> <span class="st">&quot;B&quot;</span>),</span>
+<span id="cb11-26"><a href="#cb11-26" tabindex="-1"></a>    <span class="at">expand =</span> <span class="fu">expansion</span>(<span class="at">mult =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.15</span>))</span>
+<span id="cb11-27"><a href="#cb11-27" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb11-28"><a href="#cb11-28" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb11-29"><a href="#cb11-29" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">&quot;PIX Transactions by Initiation Method&quot;</span>,</span>
+<span id="cb11-30"><a href="#cb11-30" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">&quot;September 2025&quot;</span>,</span>
+<span id="cb11-31"><a href="#cb11-31" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">&quot;Initiation Method&quot;</span>,</span>
+<span id="cb11-32"><a href="#cb11-32" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">&quot;Transaction Count (Billions)&quot;</span>,</span>
+<span id="cb11-33"><a href="#cb11-33" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">&quot;Source: Brazilian Central Bank Open Data&quot;</span></span>
+<span id="cb11-34"><a href="#cb11-34" tabindex="-1"></a>  )</span></code></pre></div>
+</div>
+<div id="example-11-creating-a-summary-report" class="section level2">
+<h2>Example 11: Creating a Summary Report</h2>
+<p>Generate a comprehensive summary report:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="co"># Function to create a PIX summary for a given month</span></span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a>create_pix_summary <span class="ot">&lt;-</span> <span class="cf">function</span>(database, date) {</span>
+<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a>  <span class="co"># Keys data</span></span>
+<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a>  keys <span class="ot">&lt;-</span> <span class="fu">get_pix_keys</span>(<span class="at">date =</span> date, <span class="at">verbose =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a>  keys_summary <span class="ot">&lt;-</span> keys <span class="sc">|&gt;</span></span>
+<span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a>    <span class="fu">summarise</span>(</span>
+<span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a>      <span class="at">total_keys =</span> <span class="fu">sum</span>(qtdChaves, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb12-8"><a href="#cb12-8" tabindex="-1"></a>      <span class="at">n_institutions =</span> <span class="fu">n_distinct</span>(ISPB)</span>
+<span id="cb12-9"><a href="#cb12-9" tabindex="-1"></a>    )</span>
+<span id="cb12-10"><a href="#cb12-10" tabindex="-1"></a>  </span>
+<span id="cb12-11"><a href="#cb12-11" tabindex="-1"></a>  <span class="co"># Transaction stats</span></span>
+<span id="cb12-12"><a href="#cb12-12" tabindex="-1"></a>  stats <span class="ot">&lt;-</span> <span class="fu">get_pix_summary</span>(<span class="at">database =</span> database, <span class="at">group_by =</span> <span class="st">&quot;NATUREZA&quot;</span>, <span class="at">verbose =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb12-13"><a href="#cb12-13" tabindex="-1"></a>  stats_total <span class="ot">&lt;-</span> stats <span class="sc">|&gt;</span></span>
+<span id="cb12-14"><a href="#cb12-14" tabindex="-1"></a>    <span class="fu">summarise</span>(</span>
+<span id="cb12-15"><a href="#cb12-15" tabindex="-1"></a>      <span class="at">total_value =</span> <span class="fu">sum</span>(total_value),</span>
+<span id="cb12-16"><a href="#cb12-16" tabindex="-1"></a>      <span class="at">total_count =</span> <span class="fu">sum</span>(total_count)</span>
+<span id="cb12-17"><a href="#cb12-17" tabindex="-1"></a>    )</span>
+<span id="cb12-18"><a href="#cb12-18" tabindex="-1"></a>  </span>
+<span id="cb12-19"><a href="#cb12-19" tabindex="-1"></a>  <span class="co"># State data</span></span>
+<span id="cb12-20"><a href="#cb12-20" tabindex="-1"></a>  state <span class="ot">&lt;-</span> <span class="fu">get_pix_transactions_by_state</span>(<span class="at">database =</span> database, <span class="at">verbose =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb12-21"><a href="#cb12-21" tabindex="-1"></a>  top_state <span class="ot">&lt;-</span> state <span class="sc">|&gt;</span></span>
+<span id="cb12-22"><a href="#cb12-22" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">total =</span> vl_pagador_pf <span class="sc">+</span> vl_pagador_pj) <span class="sc">|&gt;</span></span>
+<span id="cb12-23"><a href="#cb12-23" tabindex="-1"></a>    <span class="fu">slice_max</span>(total, <span class="at">n =</span> <span class="dv">1</span>) <span class="sc">|&gt;</span></span>
+<span id="cb12-24"><a href="#cb12-24" tabindex="-1"></a>    <span class="fu">pull</span>(Estado)</span>
+<span id="cb12-25"><a href="#cb12-25" tabindex="-1"></a>  </span>
+<span id="cb12-26"><a href="#cb12-26" tabindex="-1"></a>  <span class="fu">list</span>(</span>
+<span id="cb12-27"><a href="#cb12-27" tabindex="-1"></a>    <span class="at">period =</span> database,</span>
+<span id="cb12-28"><a href="#cb12-28" tabindex="-1"></a>    <span class="at">total_keys =</span> keys_summary<span class="sc">$</span>total_keys,</span>
+<span id="cb12-29"><a href="#cb12-29" tabindex="-1"></a>    <span class="at">n_institutions =</span> keys_summary<span class="sc">$</span>n_institutions,</span>
+<span id="cb12-30"><a href="#cb12-30" tabindex="-1"></a>    <span class="at">transaction_count =</span> stats_total<span class="sc">$</span>total_count,</span>
+<span id="cb12-31"><a href="#cb12-31" tabindex="-1"></a>    <span class="at">transaction_value =</span> stats_total<span class="sc">$</span>total_value,</span>
+<span id="cb12-32"><a href="#cb12-32" tabindex="-1"></a>    <span class="at">avg_transaction =</span> stats_total<span class="sc">$</span>total_value <span class="sc">/</span> stats_total<span class="sc">$</span>total_count,</span>
+<span id="cb12-33"><a href="#cb12-33" tabindex="-1"></a>    <span class="at">top_state =</span> top_state</span>
+<span id="cb12-34"><a href="#cb12-34" tabindex="-1"></a>  )</span>
+<span id="cb12-35"><a href="#cb12-35" tabindex="-1"></a>}</span>
+<span id="cb12-36"><a href="#cb12-36" tabindex="-1"></a></span>
+<span id="cb12-37"><a href="#cb12-37" tabindex="-1"></a><span class="co"># Generate summary for September 2025</span></span>
+<span id="cb12-38"><a href="#cb12-38" tabindex="-1"></a>summary_sep_2025 <span class="ot">&lt;-</span> <span class="fu">create_pix_summary</span>(</span>
+<span id="cb12-39"><a href="#cb12-39" tabindex="-1"></a>  <span class="at">database =</span> <span class="st">&quot;202509&quot;</span>,</span>
+<span id="cb12-40"><a href="#cb12-40" tabindex="-1"></a>  <span class="at">date =</span> <span class="st">&quot;2025-09-01&quot;</span></span>
+<span id="cb12-41"><a href="#cb12-41" tabindex="-1"></a>)</span>
+<span id="cb12-42"><a href="#cb12-42" tabindex="-1"></a></span>
+<span id="cb12-43"><a href="#cb12-43" tabindex="-1"></a><span class="co"># Print formatted summary</span></span>
+<span id="cb12-44"><a href="#cb12-44" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">sprintf</span>(</span>
+<span id="cb12-45"><a href="#cb12-45" tabindex="-1"></a>  <span class="st">&quot;</span></span>
+<span id="cb12-46"><a href="#cb12-46" tabindex="-1"></a><span class="st">=== PIX Summary Report: %s ===</span></span>
+<span id="cb12-47"><a href="#cb12-47" tabindex="-1"></a></span>
+<span id="cb12-48"><a href="#cb12-48" tabindex="-1"></a><span class="st">📊 Keys &amp; Participants</span></span>
+<span id="cb12-49"><a href="#cb12-49" tabindex="-1"></a><span class="st">  - Total registered keys: %s</span></span>
+<span id="cb12-50"><a href="#cb12-50" tabindex="-1"></a><span class="st">  - Active institutions: %d</span></span>
+<span id="cb12-51"><a href="#cb12-51" tabindex="-1"></a></span>
+<span id="cb12-52"><a href="#cb12-52" tabindex="-1"></a><span class="st">💳 Transactions</span></span>
+<span id="cb12-53"><a href="#cb12-53" tabindex="-1"></a><span class="st">  - Monthly count: %s</span></span>
+<span id="cb12-54"><a href="#cb12-54" tabindex="-1"></a><span class="st">  - Monthly value: %s</span></span>
+<span id="cb12-55"><a href="#cb12-55" tabindex="-1"></a><span class="st">  - Average transaction: %s</span></span>
+<span id="cb12-56"><a href="#cb12-56" tabindex="-1"></a></span>
+<span id="cb12-57"><a href="#cb12-57" tabindex="-1"></a><span class="st">🗺️ Regional</span></span>
+<span id="cb12-58"><a href="#cb12-58" tabindex="-1"></a><span class="st">  - Most active state: %s</span></span>
+<span id="cb12-59"><a href="#cb12-59" tabindex="-1"></a><span class="st">&quot;</span>,</span>
+<span id="cb12-60"><a href="#cb12-60" tabindex="-1"></a>  summary_sep_2025<span class="sc">$</span>period,</span>
+<span id="cb12-61"><a href="#cb12-61" tabindex="-1"></a>  <span class="fu">format</span>(summary_sep_2025<span class="sc">$</span>total_keys, <span class="at">big.mark =</span> <span class="st">&quot;,&quot;</span>),</span>
+<span id="cb12-62"><a href="#cb12-62" tabindex="-1"></a>  summary_sep_2025<span class="sc">$</span>n_institutions,</span>
+<span id="cb12-63"><a href="#cb12-63" tabindex="-1"></a>  <span class="fu">format</span>(summary_sep_2025<span class="sc">$</span>transaction_count, <span class="at">big.mark =</span> <span class="st">&quot;,&quot;</span>),</span>
+<span id="cb12-64"><a href="#cb12-64" tabindex="-1"></a>  <span class="fu">format_brl</span>(summary_sep_2025<span class="sc">$</span>transaction_value),</span>
+<span id="cb12-65"><a href="#cb12-65" tabindex="-1"></a>  <span class="fu">format_brl</span>(summary_sep_2025<span class="sc">$</span>avg_transaction),</span>
+<span id="cb12-66"><a href="#cb12-66" tabindex="-1"></a>  summary_sep_2025<span class="sc">$</span>top_state</span>
+<span id="cb12-67"><a href="#cb12-67" tabindex="-1"></a>))</span></code></pre></div>
+</div>
+<div id="example-12-exporting-data" class="section level2">
+<h2>Example 12: Exporting Data</h2>
+<p>Export data for use in other tools:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a><span class="co"># Get comprehensive dataset</span></span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a>keys <span class="ot">&lt;-</span> <span class="fu">get_pix_keys</span>(<span class="at">date =</span> <span class="st">&quot;2025-12-01&quot;</span>)</span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a><span class="co"># Export to CSV</span></span>
+<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a><span class="fu">write.csv</span>(keys, <span class="st">&quot;pix_keys_202512.csv&quot;</span>, <span class="at">row.names =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb13-6"><a href="#cb13-6" tabindex="-1"></a></span>
+<span id="cb13-7"><a href="#cb13-7" tabindex="-1"></a><span class="co"># Export to Excel (requires writexl package)</span></span>
+<span id="cb13-8"><a href="#cb13-8" tabindex="-1"></a><span class="co"># writexl::write_xlsx(keys, &quot;pix_keys_202512.xlsx&quot;)</span></span>
+<span id="cb13-9"><a href="#cb13-9" tabindex="-1"></a></span>
+<span id="cb13-10"><a href="#cb13-10" tabindex="-1"></a><span class="co"># Export multiple sheets</span></span>
+<span id="cb13-11"><a href="#cb13-11" tabindex="-1"></a><span class="co"># writexl::write_xlsx(</span></span>
+<span id="cb13-12"><a href="#cb13-12" tabindex="-1"></a><span class="co">#   list(</span></span>
+<span id="cb13-13"><a href="#cb13-13" tabindex="-1"></a><span class="co">#     keys = keys,</span></span>
+<span id="cb13-14"><a href="#cb13-14" tabindex="-1"></a><span class="co">#     stats = get_pix_transaction_stats(database = &quot;202512&quot;),</span></span>
+<span id="cb13-15"><a href="#cb13-15" tabindex="-1"></a><span class="co">#     states = get_pix_transactions_by_state(database = &quot;202512&quot;)</span></span>
+<span id="cb13-16"><a href="#cb13-16" tabindex="-1"></a><span class="co">#   ),</span></span>
+<span id="cb13-17"><a href="#cb13-17" tabindex="-1"></a><span class="co">#   &quot;pix_data_202512.xlsx&quot;</span></span>
+<span id="cb13-18"><a href="#cb13-18" tabindex="-1"></a><span class="co"># )</span></span></code></pre></div>
+</div>
+<div id="tips-for-large-scale-analysis" class="section level2">
+<h2>Tips for Large-Scale Analysis</h2>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="co"># 1. Use column selection to reduce memory usage</span></span>
+<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a>small_data <span class="ot">&lt;-</span> <span class="fu">get_pix_keys</span>(</span>
+<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a>  <span class="at">date =</span> <span class="st">&quot;2025-12-01&quot;</span>,</span>
+<span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a>  <span class="at">columns =</span> <span class="fu">c</span>(<span class="st">&quot;Nome&quot;</span>, <span class="st">&quot;TipoChave&quot;</span>, <span class="st">&quot;qtdChaves&quot;</span>),</span>
+<span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a>  <span class="at">verbose =</span> <span class="cn">FALSE</span></span>
+<span id="cb14-6"><a href="#cb14-6" tabindex="-1"></a>)</span>
+<span id="cb14-7"><a href="#cb14-7" tabindex="-1"></a></span>
+<span id="cb14-8"><a href="#cb14-8" tabindex="-1"></a><span class="co"># 2. Use filters to reduce data transfer</span></span>
+<span id="cb14-9"><a href="#cb14-9" tabindex="-1"></a>filtered <span class="ot">&lt;-</span> <span class="fu">get_pix_transactions_by_municipality</span>(</span>
+<span id="cb14-10"><a href="#cb14-10" tabindex="-1"></a>  <span class="at">database =</span> <span class="st">&quot;202512&quot;</span>,</span>
+<span id="cb14-11"><a href="#cb14-11" tabindex="-1"></a>  <span class="at">filter =</span> <span class="st">&quot;Estado eq &#39;SÃO PAULO&#39;&quot;</span>,</span>
+<span id="cb14-12"><a href="#cb14-12" tabindex="-1"></a>  <span class="at">verbose =</span> <span class="cn">FALSE</span></span>
+<span id="cb14-13"><a href="#cb14-13" tabindex="-1"></a>)</span>
+<span id="cb14-14"><a href="#cb14-14" tabindex="-1"></a></span>
+<span id="cb14-15"><a href="#cb14-15" tabindex="-1"></a><span class="co"># 3. Process multiple months efficiently</span></span>
+<span id="cb14-16"><a href="#cb14-16" tabindex="-1"></a>process_quarter <span class="ot">&lt;-</span> <span class="cf">function</span>(year, quarter) {</span>
+<span id="cb14-17"><a href="#cb14-17" tabindex="-1"></a>  months <span class="ot">&lt;-</span> <span class="cf">switch</span>(quarter,</span>
+<span id="cb14-18"><a href="#cb14-18" tabindex="-1"></a>    <span class="st">&quot;Q1&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;01&quot;</span>, <span class="st">&quot;02&quot;</span>, <span class="st">&quot;03&quot;</span>),</span>
+<span id="cb14-19"><a href="#cb14-19" tabindex="-1"></a>    <span class="st">&quot;Q2&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;04&quot;</span>, <span class="st">&quot;05&quot;</span>, <span class="st">&quot;06&quot;</span>),</span>
+<span id="cb14-20"><a href="#cb14-20" tabindex="-1"></a>    <span class="st">&quot;Q3&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;07&quot;</span>, <span class="st">&quot;08&quot;</span>, <span class="st">&quot;09&quot;</span>),</span>
+<span id="cb14-21"><a href="#cb14-21" tabindex="-1"></a>    <span class="st">&quot;Q4&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;10&quot;</span>, <span class="st">&quot;11&quot;</span>, <span class="st">&quot;12&quot;</span>)</span>
+<span id="cb14-22"><a href="#cb14-22" tabindex="-1"></a>  )</span>
+<span id="cb14-23"><a href="#cb14-23" tabindex="-1"></a>  </span>
+<span id="cb14-24"><a href="#cb14-24" tabindex="-1"></a>  databases <span class="ot">&lt;-</span> <span class="fu">paste0</span>(year, months)</span>
+<span id="cb14-25"><a href="#cb14-25" tabindex="-1"></a>  <span class="fu">get_pix_transaction_stats_multi</span>(databases)</span>
+<span id="cb14-26"><a href="#cb14-26" tabindex="-1"></a>}</span>
+<span id="cb14-27"><a href="#cb14-27" tabindex="-1"></a></span>
+<span id="cb14-28"><a href="#cb14-28" tabindex="-1"></a><span class="co"># Get Q3 2025 data</span></span>
+<span id="cb14-29"><a href="#cb14-29" tabindex="-1"></a><span class="co"># q3_2025 &lt;- process_quarter(2025, &quot;Q3&quot;)</span></span></code></pre></div>
+</div>
+<div id="see-also" class="section level2">
+<h2>See Also</h2>
+<ul>
+<li><a href="pixr.html">Introduction to pixr</a> - Getting started</li>
+<li><a href="understanding-pix-data.html">Understanding PIX Data</a> -
+Data structure</li>
+<li><a href="odata-queries.html">Working with OData Queries</a> -
+Advanced queries with filters</li>
+</ul>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

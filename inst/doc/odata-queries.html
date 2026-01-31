@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>Working with OData Queries</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Working with OData Queries</h1>
+
+
+
+<div id="introduction-to-odata" class="section level2">
+<h2>Introduction to OData</h2>
+<p>The BCB PIX Open Data API uses the OData (Open Data Protocol)
+standard for data access. OData provides a standardized way to query and
+manipulate data using RESTful APIs.</p>
+<p>The <strong>pixr</strong> package provides full support for OData
+query parameters including <code>$filter</code>, <code>$orderby</code>,
+<code>$select</code>, <code>$top</code>, and <code>$skip</code>.</p>
+</div>
+<div id="api-endpoints-and-parameters" class="section level2">
+<h2>API Endpoints and Parameters</h2>
+<p>Each endpoint requires a specific date/database parameter:</p>
+<table>
+<colgroup>
+<col width="24%" />
+<col width="26%" />
+<col width="19%" />
+<col width="29%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Endpoint</th>
+<th>Parameter</th>
+<th>Format</th>
+<th>R Function</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>ChavesPix</td>
+<td><code>Data</code></td>
+<td>YYYY-MM-DD</td>
+<td><code>get_pix_keys(date = &quot;2025-12-01&quot;)</code></td>
+</tr>
+<tr class="even">
+<td>TransacoesPixPorMunicipio</td>
+<td><code>DataBase</code></td>
+<td>YYYYMM</td>
+<td><code>get_pix_transactions_by_municipality(database = &quot;202512&quot;)</code></td>
+</tr>
+<tr class="odd">
+<td>EstatisticasTransacoesPix</td>
+<td><code>Database</code></td>
+<td>YYYYMM</td>
+<td><code>get_pix_transaction_stats(database = &quot;202509&quot;)</code></td>
+</tr>
+<tr class="even">
+<td>EstatisticasFraudesPix</td>
+<td><code>Database</code></td>
+<td>YYYYMM</td>
+<td><code>get_pix_fraud_stats(database = &quot;202509&quot;)</code></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="filtering-with-filter" class="section level2">
+<h2>Filtering with $filter</h2>
+<p>All main functions accept a <code>filter</code> parameter that uses
+OData filter syntax.</p>
+<div id="basic-filter-syntax" class="section level3">
+<h3>Basic Filter Syntax</h3>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(pixr)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="co"># Filter transactions by state</span></span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="fu">get_pix_transactions_by_municipality</span>(</span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>  <span class="at">database =</span> <span class="st">&quot;202512&quot;</span>,</span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a>  <span class="at">filter =</span> <span class="st">&quot;Estado eq &#39;MARANHÃO&#39;&quot;</span></span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a>)</span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a><span class="co"># Filter by region</span></span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a><span class="fu">get_pix_transactions_by_municipality</span>(</span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a>  <span class="at">database =</span> <span class="st">&quot;202512&quot;</span>,</span>
+<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a>  <span class="at">filter =</span> <span class="st">&quot;Sigla_Regiao eq &#39;NE&#39;&quot;</span></span>
+<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a>)</span>
+<span id="cb1-14"><a href="#cb1-14" tabindex="-1"></a></span>
+<span id="cb1-15"><a href="#cb1-15" tabindex="-1"></a><span class="co"># Filter transaction stats by nature</span></span>
+<span id="cb1-16"><a href="#cb1-16" tabindex="-1"></a><span class="fu">get_pix_transaction_stats</span>(</span>
+<span id="cb1-17"><a href="#cb1-17" tabindex="-1"></a>  <span class="at">database =</span> <span class="st">&quot;202509&quot;</span>,</span>
+<span id="cb1-18"><a href="#cb1-18" tabindex="-1"></a>  <span class="at">filter =</span> <span class="st">&quot;NATUREZA eq &#39;P2P&#39;&quot;</span></span>
+<span id="cb1-19"><a href="#cb1-19" tabindex="-1"></a>)</span>
+<span id="cb1-20"><a href="#cb1-20" tabindex="-1"></a></span>
+<span id="cb1-21"><a href="#cb1-21" tabindex="-1"></a><span class="co"># Filter PIX keys by key type</span></span>
+<span id="cb1-22"><a href="#cb1-22" tabindex="-1"></a><span class="fu">get_pix_keys</span>(</span>
+<span id="cb1-23"><a href="#cb1-23" tabindex="-1"></a>  <span class="at">date =</span> <span class="st">&quot;2025-12-01&quot;</span>,</span>
+<span id="cb1-24"><a href="#cb1-24" tabindex="-1"></a>  <span class="at">filter =</span> <span class="st">&quot;TipoChave eq &#39;CPF&#39;&quot;</span></span>
+<span id="cb1-25"><a href="#cb1-25" tabindex="-1"></a>)</span></code></pre></div>
+</div>
+<div id="comparison-operators" class="section level3">
+<h3>Comparison Operators</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Operator</th>
+<th>Meaning</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>eq</code></td>
+<td>Equal</td>
+<td><code>&quot;Estado eq &#39;SÃO PAULO&#39;&quot;</code></td>
+</tr>
+<tr class="even">
+<td><code>ne</code></td>
+<td>Not equal</td>
+<td><code>&quot;NATUREZA ne &#39;P2P&#39;&quot;</code></td>
+</tr>
+<tr class="odd">
+<td><code>gt</code></td>
+<td>Greater than</td>
+<td><code>&quot;VALOR gt 1000&quot;</code></td>
+</tr>
+<tr class="even">
+<td><code>ge</code></td>
+<td>Greater or equal</td>
+<td><code>&quot;QUANTIDADE ge 100&quot;</code></td>
+</tr>
+<tr class="odd">
+<td><code>lt</code></td>
+<td>Less than</td>
+<td><code>&quot;VALOR lt 5000&quot;</code></td>
+</tr>
+<tr class="even">
+<td><code>le</code></td>
+<td>Less or equal</td>
+<td><code>&quot;qtdChaves le 1000&quot;</code></td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="co"># Greater than</span></span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="fu">get_pix_transaction_stats</span>(</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>  <span class="at">database =</span> <span class="st">&quot;202509&quot;</span>,</span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>  <span class="at">filter =</span> <span class="st">&quot;VALOR gt 10000&quot;</span></span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>)</span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="co"># Less than or equal</span></span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="fu">get_pix_keys</span>(</span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>  <span class="at">date =</span> <span class="st">&quot;2025-12-01&quot;</span>,</span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a>  <span class="at">filter =</span> <span class="st">&quot;qtdChaves le 1000&quot;</span></span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a>)</span></code></pre></div>
+</div>
+<div id="logical-operators" class="section level3">
+<h3>Logical Operators</h3>
+<p>Combine multiple conditions with <code>and</code> and
+<code>or</code>:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Operator</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>and</code></td>
+<td><code>&quot;NATUREZA eq &#39;P2P&#39; and PAG_REGIAO eq &#39;SUDESTE&#39;&quot;</code></td>
+</tr>
+<tr class="even">
+<td><code>or</code></td>
+<td><code>&quot;Estado eq &#39;SP&#39; or Estado eq &#39;RJ&#39;&quot;</code></td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="co"># AND - both conditions must be true</span></span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="fu">get_pix_transaction_stats</span>(</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>  <span class="at">database =</span> <span class="st">&quot;202509&quot;</span>,</span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>  <span class="at">filter =</span> <span class="st">&quot;NATUREZA eq &#39;P2P&#39; and PAG_REGIAO eq &#39;SUDESTE&#39;&quot;</span></span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>)</span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="co"># OR - either condition can be true</span></span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a><span class="fu">get_pix_transactions_by_municipality</span>(</span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a>  <span class="at">database =</span> <span class="st">&quot;202512&quot;</span>,</span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a>  <span class="at">filter =</span> <span class="st">&quot;Estado eq &#39;SÃO PAULO&#39; or Estado eq &#39;RIO DE JANEIRO&#39;&quot;</span></span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a>)</span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a></span>
+<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a><span class="co"># Complex filter with multiple conditions</span></span>
+<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a><span class="fu">get_pix_transaction_stats</span>(</span>
+<span id="cb3-15"><a href="#cb3-15" tabindex="-1"></a>  <span class="at">database =</span> <span class="st">&quot;202509&quot;</span>,</span>
+<span id="cb3-16"><a href="#cb3-16" tabindex="-1"></a>  <span class="at">filter =</span> <span class="st">&quot;NATUREZA eq &#39;P2P&#39; and PAG_REGIAO eq &#39;NORDESTE&#39; and VALOR gt 1000&quot;</span></span>
+<span id="cb3-17"><a href="#cb3-17" tabindex="-1"></a>)</span></code></pre></div>
+</div>
+<div id="string-functions" class="section level3">
+<h3>String Functions</h3>
+<p>The API supports string functions for text matching:</p>
+<table>
+<colgroup>
+<col width="31%" />
+<col width="40%" />
+<col width="28%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Function</th>
+<th>Description</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>contains(field, value)</code></td>
+<td>Substring match</td>
+<td><code>&quot;contains(Nome, &#39;BANCO&#39;)&quot;</code></td>
+</tr>
+<tr class="even">
+<td><code>startswith(field, value)</code></td>
+<td>Starts with</td>
+<td><code>&quot;startswith(Nome, &#39;COOP&#39;)&quot;</code></td>
+</tr>
+<tr class="odd">
+<td><code>endswith(field, value)</code></td>
+<td>Ends with</td>
+<td><code>&quot;endswith(Nome, &#39;S.A.&#39;)&quot;</code></td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="co"># Find institutions containing &quot;SICREDI&quot;</span></span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="fu">get_pix_keys</span>(</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>  <span class="at">date =</span> <span class="st">&quot;2025-12-01&quot;</span>,</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>  <span class="at">filter =</span> <span class="st">&quot;contains(Nome, &#39;SICREDI&#39;)&quot;</span></span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>)</span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="co"># Find cooperatives (starting with COOP)</span></span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a><span class="fu">get_pix_keys</span>(</span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a>  <span class="at">date =</span> <span class="st">&quot;2025-12-01&quot;</span>,</span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a>  <span class="at">filter =</span> <span class="st">&quot;startswith(Nome, &#39;COOP&#39;)&quot;</span></span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a>)</span></code></pre></div>
+</div>
+</div>
+<div id="ordering-with-orderby" class="section level2">
+<h2>Ordering with $orderby</h2>
+<p>Sort results by any column using the <code>orderby</code>
+parameter.</p>
+<div id="basic-ordering" class="section level3">
+<h3>Basic Ordering</h3>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="co"># Ascending order (default)</span></span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="fu">get_pix_keys</span>(</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>  <span class="at">date =</span> <span class="st">&quot;2025-12-01&quot;</span>,</span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>  <span class="at">orderby =</span> <span class="st">&quot;qtdChaves&quot;</span></span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>)</span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a><span class="co"># Descending order (add &quot;desc&quot;)</span></span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a><span class="fu">get_pix_keys</span>(</span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a>  <span class="at">date =</span> <span class="st">&quot;2025-12-01&quot;</span>,</span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a>  <span class="at">orderby =</span> <span class="st">&quot;qtdChaves desc&quot;</span></span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a>)</span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a></span>
+<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a><span class="co"># Order municipalities alphabetically</span></span>
+<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a><span class="fu">get_pix_transactions_by_municipality</span>(</span>
+<span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a>  <span class="at">database =</span> <span class="st">&quot;202512&quot;</span>,</span>
+<span id="cb5-16"><a href="#cb5-16" tabindex="-1"></a>  <span class="at">orderby =</span> <span class="st">&quot;Municipio&quot;</span></span>
+<span id="cb5-17"><a href="#cb5-17" tabindex="-1"></a>)</span>
+<span id="cb5-18"><a href="#cb5-18" tabindex="-1"></a></span>
+<span id="cb5-19"><a href="#cb5-19" tabindex="-1"></a><span class="co"># Order by value descending</span></span>
+<span id="cb5-20"><a href="#cb5-20" tabindex="-1"></a><span class="fu">get_pix_transaction_stats</span>(</span>
+<span id="cb5-21"><a href="#cb5-21" tabindex="-1"></a>  <span class="at">database =</span> <span class="st">&quot;202509&quot;</span>,</span>
+<span id="cb5-22"><a href="#cb5-22" tabindex="-1"></a>  <span class="at">orderby =</span> <span class="st">&quot;VALOR desc&quot;</span></span>
+<span id="cb5-23"><a href="#cb5-23" tabindex="-1"></a>)</span></code></pre></div>
+</div>
+<div id="combining-filter-and-orderby" class="section level3">
+<h3>Combining Filter and OrderBy</h3>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="co"># Filter by state and order by municipality name (descending)</span></span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a><span class="fu">get_pix_transactions_by_municipality</span>(</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>  <span class="at">database =</span> <span class="st">&quot;202512&quot;</span>,</span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>  <span class="at">filter =</span> <span class="st">&quot;Estado eq &#39;MARANHÃO&#39;&quot;</span>,</span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>  <span class="at">orderby =</span> <span class="st">&quot;Municipio desc&quot;</span>,</span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a>  <span class="at">top =</span> <span class="dv">10</span></span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a>)</span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a></span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a><span class="co"># Filter P2P transactions and order by value</span></span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a><span class="fu">get_pix_transaction_stats</span>(</span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a>  <span class="at">database =</span> <span class="st">&quot;202509&quot;</span>,</span>
+<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a>  <span class="at">filter =</span> <span class="st">&quot;NATUREZA eq &#39;P2P&#39;&quot;</span>,</span>
+<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a>  <span class="at">orderby =</span> <span class="st">&quot;VALOR desc&quot;</span>,</span>
+<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a>  <span class="at">top =</span> <span class="dv">100</span></span>
+<span id="cb6-15"><a href="#cb6-15" tabindex="-1"></a>)</span>
+<span id="cb6-16"><a href="#cb6-16" tabindex="-1"></a></span>
+<span id="cb6-17"><a href="#cb6-17" tabindex="-1"></a><span class="co"># Filter by key type and order by quantity</span></span>
+<span id="cb6-18"><a href="#cb6-18" tabindex="-1"></a><span class="fu">get_pix_keys</span>(</span>
+<span id="cb6-19"><a href="#cb6-19" tabindex="-1"></a>  <span class="at">date =</span> <span class="st">&quot;2025-12-01&quot;</span>,</span>
+<span id="cb6-20"><a href="#cb6-20" tabindex="-1"></a>  <span class="at">filter =</span> <span class="st">&quot;TipoChave eq &#39;CPF&#39; and NaturezaUsuario eq &#39;PF&#39;&quot;</span>,</span>
+<span id="cb6-21"><a href="#cb6-21" tabindex="-1"></a>  <span class="at">orderby =</span> <span class="st">&quot;qtdChaves desc&quot;</span>,</span>
+<span id="cb6-22"><a href="#cb6-22" tabindex="-1"></a>  <span class="at">top =</span> <span class="dv">50</span></span>
+<span id="cb6-23"><a href="#cb6-23" tabindex="-1"></a>)</span></code></pre></div>
+</div>
+</div>
+<div id="selecting-columns-with-select" class="section level2">
+<h2>Selecting Columns with $select</h2>
+<p>Retrieve only the columns you need using the <code>columns</code>
+parameter:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="co"># Select specific columns for PIX keys</span></span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a><span class="fu">get_pix_keys</span>(</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>  <span class="at">date =</span> <span class="st">&quot;2025-12-01&quot;</span>,</span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>  <span class="at">columns =</span> <span class="fu">c</span>(<span class="st">&quot;Nome&quot;</span>, <span class="st">&quot;ISPB&quot;</span>, <span class="st">&quot;TipoChave&quot;</span>, <span class="st">&quot;qtdChaves&quot;</span>),</span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>  <span class="at">top =</span> <span class="dv">100</span></span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a>)</span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a><span class="co"># Select specific columns for transactions</span></span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a><span class="fu">get_pix_transactions_by_municipality</span>(</span>
+<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a>  <span class="at">database =</span> <span class="st">&quot;202512&quot;</span>,</span>
+<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a>  <span class="at">columns =</span> <span class="fu">c</span>(<span class="st">&quot;Estado&quot;</span>, <span class="st">&quot;Municipio&quot;</span>, <span class="st">&quot;VL_PagadorPF&quot;</span>, <span class="st">&quot;QT_PagadorPF&quot;</span>),</span>
+<span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a>  <span class="at">top =</span> <span class="dv">100</span></span>
+<span id="cb7-13"><a href="#cb7-13" tabindex="-1"></a>)</span></code></pre></div>
+</div>
+<div id="pagination-with-top-and-skip" class="section level2">
+<h2>Pagination with $top and $skip</h2>
+<p>Control the number of results returned:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="co"># Get first 10 records</span></span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a><span class="fu">get_pix_keys</span>(<span class="at">date =</span> <span class="st">&quot;2025-12-01&quot;</span>, <span class="at">top =</span> <span class="dv">10</span>)</span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a><span class="co"># Skip first 100 records, get next 50</span></span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a><span class="fu">get_pix_keys</span>(<span class="at">date =</span> <span class="st">&quot;2025-12-01&quot;</span>, <span class="at">top =</span> <span class="dv">50</span>, <span class="at">skip =</span> <span class="dv">100</span>)</span></code></pre></div>
+<div id="iterating-through-all-data" class="section level3">
+<h3>Iterating Through All Data</h3>
+<p>For large datasets, use pagination to download in batches:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="co"># Download all data in chunks</span></span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>all_data <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>skip <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a>batch_size <span class="ot">&lt;-</span> <span class="dv">1000</span></span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a></span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a><span class="cf">repeat</span> {</span>
+<span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a>  batch <span class="ot">&lt;-</span> <span class="fu">get_pix_keys</span>(</span>
+<span id="cb9-8"><a href="#cb9-8" tabindex="-1"></a>    <span class="at">date =</span> <span class="st">&quot;2025-12-01&quot;</span>,</span>
+<span id="cb9-9"><a href="#cb9-9" tabindex="-1"></a>    <span class="at">top =</span> batch_size,</span>
+<span id="cb9-10"><a href="#cb9-10" tabindex="-1"></a>    <span class="at">skip =</span> skip,</span>
+<span id="cb9-11"><a href="#cb9-11" tabindex="-1"></a>    <span class="at">verbose =</span> <span class="cn">FALSE</span></span>
+<span id="cb9-12"><a href="#cb9-12" tabindex="-1"></a>  )</span>
+<span id="cb9-13"><a href="#cb9-13" tabindex="-1"></a> </span>
+<span id="cb9-14"><a href="#cb9-14" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">nrow</span>(batch) <span class="sc">==</span> <span class="dv">0</span>) <span class="cf">break</span></span>
+<span id="cb9-15"><a href="#cb9-15" tabindex="-1"></a> </span>
+<span id="cb9-16"><a href="#cb9-16" tabindex="-1"></a>  all_data <span class="ot">&lt;-</span> <span class="fu">c</span>(all_data, <span class="fu">list</span>(batch))</span>
+<span id="cb9-17"><a href="#cb9-17" tabindex="-1"></a>  skip <span class="ot">&lt;-</span> skip <span class="sc">+</span> batch_size</span>
+<span id="cb9-18"><a href="#cb9-18" tabindex="-1"></a> </span>
+<span id="cb9-19"><a href="#cb9-19" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">nrow</span>(batch) <span class="sc">&lt;</span> batch_size) <span class="cf">break</span></span>
+<span id="cb9-20"><a href="#cb9-20" tabindex="-1"></a>}</span>
+<span id="cb9-21"><a href="#cb9-21" tabindex="-1"></a></span>
+<span id="cb9-22"><a href="#cb9-22" tabindex="-1"></a><span class="co"># Combine all batches</span></span>
+<span id="cb9-23"><a href="#cb9-23" tabindex="-1"></a>final_data <span class="ot">&lt;-</span> dplyr<span class="sc">::</span><span class="fu">bind_rows</span>(all_data)</span></code></pre></div>
+</div>
+</div>
+<div id="custom-queries-with-pix_query" class="section level2">
+<h2>Custom Queries with pix_query()</h2>
+<p>For advanced use cases, use <code>pix_query()</code> with raw OData
+parameters:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="co"># Custom query with all parameters</span></span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a><span class="fu">pix_query</span>(</span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a>  <span class="at">endpoint =</span> <span class="st">&quot;TransacoesPixPorMunicipio&quot;</span>,</span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a>  <span class="at">params =</span> <span class="fu">list</span>(<span class="at">DataBase =</span> <span class="st">&quot;202512&quot;</span>),</span>
+<span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a>  <span class="at">filter =</span> <span class="st">&quot;Sigla_Regiao eq &#39;SE&#39;&quot;</span>,</span>
+<span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a>  <span class="at">select =</span> <span class="fu">c</span>(<span class="st">&quot;Estado&quot;</span>, <span class="st">&quot;Municipio&quot;</span>, <span class="st">&quot;VL_PagadorPF&quot;</span>),</span>
+<span id="cb10-7"><a href="#cb10-7" tabindex="-1"></a>  <span class="at">orderby =</span> <span class="st">&quot;VL_PagadorPF desc&quot;</span>,</span>
+<span id="cb10-8"><a href="#cb10-8" tabindex="-1"></a>  <span class="at">top =</span> <span class="dv">50</span></span>
+<span id="cb10-9"><a href="#cb10-9" tabindex="-1"></a>)</span>
+<span id="cb10-10"><a href="#cb10-10" tabindex="-1"></a></span>
+<span id="cb10-11"><a href="#cb10-11" tabindex="-1"></a><span class="co"># Custom query for transaction stats</span></span>
+<span id="cb10-12"><a href="#cb10-12" tabindex="-1"></a><span class="fu">pix_query</span>(</span>
+<span id="cb10-13"><a href="#cb10-13" tabindex="-1"></a>  <span class="at">endpoint =</span> <span class="st">&quot;EstatisticasTransacoesPix&quot;</span>,</span>
+<span id="cb10-14"><a href="#cb10-14" tabindex="-1"></a>  <span class="at">params =</span> <span class="fu">list</span>(<span class="at">Database =</span> <span class="st">&quot;202509&quot;</span>),</span>
+<span id="cb10-15"><a href="#cb10-15" tabindex="-1"></a>  <span class="at">filter =</span> <span class="st">&quot;NATUREZA eq &#39;P2B&#39; and FORMAINICIACAO eq &#39;QRDN&#39;&quot;</span>,</span>
+<span id="cb10-16"><a href="#cb10-16" tabindex="-1"></a>  <span class="at">orderby =</span> <span class="st">&quot;QUANTIDADE desc&quot;</span>,</span>
+<span id="cb10-17"><a href="#cb10-17" tabindex="-1"></a>  <span class="at">top =</span> <span class="dv">100</span></span>
+<span id="cb10-18"><a href="#cb10-18" tabindex="-1"></a>)</span></code></pre></div>
+</div>
+<div id="building-and-debugging-urls" class="section level2">
+<h2>Building and Debugging URLs</h2>
+<p>Use <code>pix_url()</code> to see the URL that would be called:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="co"># See the URL for a query</span></span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a><span class="fu">pix_url</span>(</span>
+<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a>  <span class="st">&quot;TransacoesPixPorMunicipio&quot;</span>,</span>
+<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a>  <span class="at">params =</span> <span class="fu">list</span>(<span class="at">DataBase =</span> <span class="st">&quot;202512&quot;</span>),</span>
+<span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a>  <span class="at">filter =</span> <span class="st">&quot;Estado eq &#39;MARANHÃO&#39;&quot;</span>,</span>
+<span id="cb11-6"><a href="#cb11-6" tabindex="-1"></a>  <span class="at">orderby =</span> <span class="st">&quot;Municipio desc&quot;</span>,</span>
+<span id="cb11-7"><a href="#cb11-7" tabindex="-1"></a>  <span class="at">top =</span> <span class="dv">10</span></span>
+<span id="cb11-8"><a href="#cb11-8" tabindex="-1"></a>)</span>
+<span id="cb11-9"><a href="#cb11-9" tabindex="-1"></a><span class="co"># Returns:</span></span>
+<span id="cb11-10"><a href="#cb11-10" tabindex="-1"></a><span class="co"># https://olinda.bcb.gov.br/olinda/servico/Pix_DadosAbertos/versao/v1/odata/</span></span>
+<span id="cb11-11"><a href="#cb11-11" tabindex="-1"></a><span class="co">#   TransacoesPixPorMunicipio(DataBase=@DataBase)?$format=json&amp;@DataBase=&#39;202512&#39;</span></span>
+<span id="cb11-12"><a href="#cb11-12" tabindex="-1"></a><span class="co">#   &amp;$filter=Estado eq &#39;MARANHÃO&#39;&amp;$orderby=Municipio desc&amp;$top=10</span></span></code></pre></div>
+</div>
+<div id="practical-examples" class="section level2">
+<h2>Practical Examples</h2>
+<div id="top-10-states-by-transaction-volume" class="section level3">
+<h3>Top 10 States by Transaction Volume</h3>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a></span>
+<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a><span class="co"># Get all municipalities and aggregate by state</span></span>
+<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a><span class="fu">get_pix_transactions_by_municipality</span>(<span class="at">database =</span> <span class="st">&quot;202512&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a>  <span class="fu">group_by</span>(Estado) <span class="sc">|&gt;</span></span>
+<span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a>    <span class="at">total_value =</span> <span class="fu">sum</span>(VL_PagadorPF <span class="sc">+</span> VL_PagadorPJ),</span>
+<span id="cb12-8"><a href="#cb12-8" tabindex="-1"></a>    <span class="at">total_count =</span> <span class="fu">sum</span>(QT_PagadorPF <span class="sc">+</span> QT_PagadorPJ),</span>
+<span id="cb12-9"><a href="#cb12-9" tabindex="-1"></a>    <span class="at">n_municipalities =</span> <span class="fu">n</span>()</span>
+<span id="cb12-10"><a href="#cb12-10" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb12-11"><a href="#cb12-11" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(total_value)) <span class="sc">|&gt;</span></span>
+<span id="cb12-12"><a href="#cb12-12" tabindex="-1"></a>  <span class="fu">head</span>(<span class="dv">10</span>)</span></code></pre></div>
+</div>
+<div id="p2p-vs-p2b-transactions-by-region" class="section level3">
+<h3>P2P vs P2B Transactions by Region</h3>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a><span class="co"># Get P2P transactions by region</span></span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a>p2p <span class="ot">&lt;-</span> <span class="fu">get_pix_transaction_stats</span>(</span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a>  <span class="at">database =</span> <span class="st">&quot;202509&quot;</span>,</span>
+<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a>  <span class="at">filter =</span> <span class="st">&quot;NATUREZA eq &#39;P2P&#39;&quot;</span></span>
+<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb13-6"><a href="#cb13-6" tabindex="-1"></a>  <span class="fu">group_by</span>(PAG_REGIAO) <span class="sc">|&gt;</span></span>
+<span id="cb13-7"><a href="#cb13-7" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">p2p_value =</span> <span class="fu">sum</span>(VALOR))</span>
+<span id="cb13-8"><a href="#cb13-8" tabindex="-1"></a></span>
+<span id="cb13-9"><a href="#cb13-9" tabindex="-1"></a><span class="co"># Get P2B transactions by region</span></span>
+<span id="cb13-10"><a href="#cb13-10" tabindex="-1"></a>p2b <span class="ot">&lt;-</span> <span class="fu">get_pix_transaction_stats</span>(</span>
+<span id="cb13-11"><a href="#cb13-11" tabindex="-1"></a>  <span class="at">database =</span> <span class="st">&quot;202509&quot;</span>,</span>
+<span id="cb13-12"><a href="#cb13-12" tabindex="-1"></a>  <span class="at">filter =</span> <span class="st">&quot;NATUREZA eq &#39;P2B&#39;&quot;</span></span>
+<span id="cb13-13"><a href="#cb13-13" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb13-14"><a href="#cb13-14" tabindex="-1"></a>  <span class="fu">group_by</span>(PAG_REGIAO) <span class="sc">|&gt;</span></span>
+<span id="cb13-15"><a href="#cb13-15" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">p2b_value =</span> <span class="fu">sum</span>(VALOR))</span>
+<span id="cb13-16"><a href="#cb13-16" tabindex="-1"></a></span>
+<span id="cb13-17"><a href="#cb13-17" tabindex="-1"></a><span class="co"># Join and compare</span></span>
+<span id="cb13-18"><a href="#cb13-18" tabindex="-1"></a><span class="fu">left_join</span>(p2p, p2b, <span class="at">by =</span> <span class="st">&quot;PAG_REGIAO&quot;</span>)</span></code></pre></div>
+</div>
+<div id="market-share-by-key-type" class="section level3">
+<h3>Market Share by Key Type</h3>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="co"># Get keys by type</span></span>
+<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a><span class="fu">get_pix_keys</span>(<span class="at">date =</span> <span class="st">&quot;2025-12-01&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a>  <span class="fu">group_by</span>(TipoChave) <span class="sc">|&gt;</span></span>
+<span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">total_keys =</span> <span class="fu">sum</span>(qtdChaves)) <span class="sc">|&gt;</span></span>
+<span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">share =</span> total_keys <span class="sc">/</span> <span class="fu">sum</span>(total_keys) <span class="sc">*</span> <span class="dv">100</span>) <span class="sc">|&gt;</span></span>
+<span id="cb14-6"><a href="#cb14-6" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(share))</span></code></pre></div>
+</div>
+</div>
+<div id="performance-tips" class="section level2">
+<h2>Performance Tips</h2>
+<ol style="list-style-type: decimal">
+<li><strong>Use filters server-side</strong>: Let the API filter instead
+of downloading all data</li>
+</ol>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a><span class="co"># Good: Filter on the server</span></span>
+<span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a><span class="fu">get_pix_transactions_by_municipality</span>(</span>
+<span id="cb15-3"><a href="#cb15-3" tabindex="-1"></a>  <span class="at">database =</span> <span class="st">&quot;202512&quot;</span>,</span>
+<span id="cb15-4"><a href="#cb15-4" tabindex="-1"></a>  <span class="at">filter =</span> <span class="st">&quot;Estado eq &#39;SÃO PAULO&#39;&quot;</span></span>
+<span id="cb15-5"><a href="#cb15-5" tabindex="-1"></a>)</span>
+<span id="cb15-6"><a href="#cb15-6" tabindex="-1"></a></span>
+<span id="cb15-7"><a href="#cb15-7" tabindex="-1"></a><span class="co"># Avoid: Downloading all data then filtering in R</span></span>
+<span id="cb15-8"><a href="#cb15-8" tabindex="-1"></a><span class="fu">get_pix_transactions_by_municipality</span>(<span class="at">database =</span> <span class="st">&quot;202512&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb15-9"><a href="#cb15-9" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(Estado <span class="sc">==</span> <span class="st">&quot;SÃO PAULO&quot;</span>)</span></code></pre></div>
+<ol start="2" style="list-style-type: decimal">
+<li><strong>Select only needed columns</strong>: Reduces response
+size</li>
+</ol>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a><span class="co"># Good: Request only what you need</span></span>
+<span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a><span class="fu">get_pix_keys</span>(</span>
+<span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a>  <span class="at">date =</span> <span class="st">&quot;2025-12-01&quot;</span>,</span>
+<span id="cb16-4"><a href="#cb16-4" tabindex="-1"></a>  <span class="at">columns =</span> <span class="fu">c</span>(<span class="st">&quot;Nome&quot;</span>, <span class="st">&quot;qtdChaves&quot;</span>)</span>
+<span id="cb16-5"><a href="#cb16-5" tabindex="-1"></a>)</span></code></pre></div>
+<ol start="3" style="list-style-type: decimal">
+<li><strong>Use <code>top</code> during development</strong>: Limit
+results when exploring</li>
+</ol>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a><span class="co"># Good: Explore with limited data</span></span>
+<span id="cb17-2"><a href="#cb17-2" tabindex="-1"></a><span class="fu">get_pix_keys</span>(<span class="at">date =</span> <span class="st">&quot;2025-12-01&quot;</span>, <span class="at">top =</span> <span class="dv">10</span>)</span></code></pre></div>
+<ol start="4" style="list-style-type: decimal">
+<li><strong>Disable verbose mode in loops</strong>: Reduces output
+clutter</li>
+</ol>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" tabindex="-1"></a><span class="fu">get_pix_keys</span>(<span class="at">date =</span> <span class="st">&quot;2025-12-01&quot;</span>, <span class="at">verbose =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
+</div>
+<div id="filter-reference-by-endpoint" class="section level2">
+<h2>Filter Reference by Endpoint</h2>
+<div id="chavespix-pix-keys" class="section level3">
+<h3>ChavesPix (PIX Keys)</h3>
+<table>
+<colgroup>
+<col width="26%" />
+<col width="20%" />
+<col width="53%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Column</th>
+<th>Type</th>
+<th>Filter Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Nome</td>
+<td>string</td>
+<td><code>&quot;Nome eq &#39;BANCO DO BRASIL S.A.&#39;&quot;</code></td>
+</tr>
+<tr class="even">
+<td>ISPB</td>
+<td>string</td>
+<td><code>&quot;ISPB eq &#39;00000000&#39;&quot;</code></td>
+</tr>
+<tr class="odd">
+<td>NaturezaUsuario</td>
+<td>string</td>
+<td><code>&quot;NaturezaUsuario eq &#39;PF&#39;&quot;</code> or
+<code>&quot;NaturezaUsuario eq &#39;PJ&#39;&quot;</code></td>
+</tr>
+<tr class="even">
+<td>TipoChave</td>
+<td>string</td>
+<td><code>&quot;TipoChave eq &#39;CPF&#39;&quot;</code>,
+<code>&quot;TipoChave eq &#39;Celular&#39;&quot;</code>,
+<code>&quot;TipoChave eq &#39;e-mail&#39;&quot;</code>,
+<code>&quot;TipoChave eq &#39;Aleatória&#39;&quot;</code>,
+<code>&quot;TipoChave eq &#39;CNPJ&#39;&quot;</code></td>
+</tr>
+<tr class="odd">
+<td>qtdChaves</td>
+<td>numeric</td>
+<td><code>&quot;qtdChaves gt 1000&quot;</code></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="transacoespixpormunicipio-transactions-by-municipality" class="section level3">
+<h3>TransacoesPixPorMunicipio (Transactions by Municipality)</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Column</th>
+<th>Type</th>
+<th>Filter Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Estado</td>
+<td>string</td>
+<td><code>&quot;Estado eq &#39;SÃO PAULO&#39;&quot;</code></td>
+</tr>
+<tr class="even">
+<td>Municipio</td>
+<td>string</td>
+<td><code>&quot;Municipio eq &#39;RECIFE&#39;&quot;</code></td>
+</tr>
+<tr class="odd">
+<td>Sigla_Regiao</td>
+<td>string</td>
+<td><code>&quot;Sigla_Regiao eq &#39;NE&#39;&quot;</code> (NE, SE, S, CO, N)</td>
+</tr>
+<tr class="even">
+<td>Regiao</td>
+<td>string</td>
+<td><code>&quot;Regiao eq &#39;NORDESTE&#39;&quot;</code></td>
+</tr>
+<tr class="odd">
+<td>VL_PagadorPF</td>
+<td>numeric</td>
+<td><code>&quot;VL_PagadorPF gt 1000000&quot;</code></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="estatisticastransacoespix-transaction-statistics" class="section level3">
+<h3>EstatisticasTransacoesPix (Transaction Statistics)</h3>
+<table>
+<colgroup>
+<col width="26%" />
+<col width="20%" />
+<col width="53%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Column</th>
+<th>Type</th>
+<th>Filter Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>PAG_PFPJ</td>
+<td>string</td>
+<td><code>&quot;PAG_PFPJ eq &#39;PF&#39;&quot;</code></td>
+</tr>
+<tr class="even">
+<td>REC_PFPJ</td>
+<td>string</td>
+<td><code>&quot;REC_PFPJ eq &#39;PJ&#39;&quot;</code></td>
+</tr>
+<tr class="odd">
+<td>PAG_REGIAO</td>
+<td>string</td>
+<td><code>&quot;PAG_REGIAO eq &#39;SUDESTE&#39;&quot;</code></td>
+</tr>
+<tr class="even">
+<td>REC_REGIAO</td>
+<td>string</td>
+<td><code>&quot;REC_REGIAO eq &#39;NORDESTE&#39;&quot;</code></td>
+</tr>
+<tr class="odd">
+<td>NATUREZA</td>
+<td>string</td>
+<td><code>&quot;NATUREZA eq &#39;P2P&#39;&quot;</code> (P2P, P2B, B2P, B2B, P2G, G2P)</td>
+</tr>
+<tr class="even">
+<td>FORMAINICIACAO</td>
+<td>string</td>
+<td><code>&quot;FORMAINICIACAO eq &#39;DICT&#39;&quot;</code> (DICT, QRDN, QRES, MANU,
+INIC)</td>
+</tr>
+<tr class="odd">
+<td>FINALIDADE</td>
+<td>string</td>
+<td><code>&quot;FINALIDADE eq &#39;Pix&#39;&quot;</code></td>
+</tr>
+<tr class="even">
+<td>VALOR</td>
+<td>numeric</td>
+<td><code>&quot;VALOR gt 10000&quot;</code></td>
+</tr>
+<tr class="odd">
+<td>QUANTIDADE</td>
+<td>numeric</td>
+<td><code>&quot;QUANTIDADE ge 100&quot;</code></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="see-also" class="section level2">
+<h2>See Also</h2>
+<ul>
+<li><a href="pixr.html">Getting Started</a> - Package introduction</li>
+<li><a href="understanding-pix-data.html">Understanding PIX Data</a> -
+Data structure details</li>
+<li><a href="analysis-examples.html">Data Analysis Examples</a> -
+Practical use cases</li>
+</ul>
+</div>
+<div id="references" class="section level2">
+<h2>References</h2>
+<ul>
+<li><a href="https://www.odata.org/documentation/">OData Protocol
+Documentation</a></li>
+<li><a href="https://olinda.bcb.gov.br/olinda/servico/Pix_DadosAbertos/versao/v1/swagger-ui3#/">BCB
+API Swagger</a></li>
+<li><a href="https://dadosabertos.bcb.gov.br/dataset/pix">BCB PIX Data
+Portal</a></li>
+</ul>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>Understanding PIX Data</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Understanding PIX Data</h1>
+
+
+
+<div id="what-is-pix" class="section level2">
+<h2>What is PIX?</h2>
+<p>PIX is Brazil’s instant payment system created and managed by the
+Brazilian Central Bank (Banco Central do Brasil - BCB). Launched on
+November 16, 2020, it enables instantaneous payments and transfers in
+Brazilian Real (BRL) 24 hours a day, 7 days a week, including holidays
+and weekends.</p>
+<p>Key features of PIX:</p>
+<ul>
+<li><strong>Instant</strong>: Transactions complete in seconds
+(typically under 10 seconds)</li>
+<li><strong>Free for individuals</strong>: No fees for personal
+transfers</li>
+<li><strong>Available 24/7</strong>: Works any time, including weekends
+and holidays</li>
+<li><strong>Multiple key types</strong>: Simplifies payments with
+easy-to-remember identifiers</li>
+</ul>
+</div>
+<div id="the-pix-ecosystem" class="section level2">
+<h2>The PIX Ecosystem</h2>
+<div id="system-components" class="section level3">
+<h3>System Components</h3>
+<ol style="list-style-type: decimal">
+<li><p><strong>SPI (Sistema de Pagamentos Instantâneos)</strong>: The
+instant payment settlement system operated by the BCB. It is the only
+infrastructure for instant payment settlement in Brazil.</p></li>
+<li><p><strong>DICT (Diretório de Identificadores de Contas
+Transacionais)</strong>: The Transaction Account Identifier Directory. A
+centralized database managed by BCB that stores PIX key registrations
+and links them to bank accounts.</p></li>
+<li><p><strong>PSP (Prestador de Serviços de Pagamento)</strong>:
+Payment Service Providers - financial institutions that offer PIX to
+their customers.</p></li>
+</ol>
+</div>
+<div id="pix-key-types" class="section level3">
+<h3>PIX Key Types</h3>
+<p>Users can register PIX keys to simplify receiving payments. Instead
+of sharing full bank details, they share just a key. Available key
+types:</p>
+<table>
+<colgroup>
+<col width="22%" />
+<col width="27%" />
+<col width="29%" />
+<col width="20%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Key Type</th>
+<th>Portuguese</th>
+<th>Description</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>CPF</td>
+<td>CPF</td>
+<td>Individual taxpayer ID (11 digits)</td>
+<td>123.456.789-00</td>
+</tr>
+<tr class="even">
+<td>CNPJ</td>
+<td>CNPJ</td>
+<td>Company taxpayer ID (14 digits)</td>
+<td>12.345.678/0001-00</td>
+</tr>
+<tr class="odd">
+<td>Phone</td>
+<td>Celular</td>
+<td>Mobile phone with country code</td>
+<td>+5511999999999</td>
+</tr>
+<tr class="even">
+<td>Email</td>
+<td>e-mail</td>
+<td>Email address</td>
+<td><a href="mailto:user@example.com" class="email">user@example.com</a></td>
+</tr>
+<tr class="odd">
+<td>Random Key</td>
+<td>Aleatória (EVP)</td>
+<td>UUID generated by the system</td>
+<td>a1b2c3d4-e5f6-7890-…</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Key limits:</strong> - Individuals: Up to 5 keys per bank
+account - Companies: Up to 20 keys per bank account</p>
+</div>
+</div>
+<div id="data-available-through-pixr" class="section level2">
+<h2>Data Available Through pixr</h2>
+<p>The BCB provides four main datasets through the PIX Open Data
+API:</p>
+<div id="pix-keys-stock-chavespix" class="section level3">
+<h3>1. PIX Keys Stock (ChavesPix)</h3>
+<p>Monthly snapshot of registered PIX keys, broken down by participant
+(financial institution), user type (PF/PJ), and key type.</p>
+<p><strong>API Parameter:</strong> <code>Data</code> in
+<code>YYYY-MM-DD</code> format</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(pixr)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="co"># View available columns</span></span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="fu">pix_columns</span>(<span class="st">&quot;keys&quot;</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a><span class="co"># Retrieve data - note: date uses YYYY-MM-DD format</span></span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a>keys <span class="ot">&lt;-</span> <span class="fu">get_pix_keys</span>(<span class="at">date =</span> <span class="st">&quot;2025-12-01&quot;</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a><span class="co"># Filter by key type using OData filter</span></span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a>cpf_keys <span class="ot">&lt;-</span> <span class="fu">get_pix_keys</span>(</span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a>  <span class="at">date =</span> <span class="st">&quot;2025-12-01&quot;</span>,</span>
+<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a>  <span class="at">filter =</span> <span class="st">&quot;TipoChave eq &#39;CPF&#39;&quot;</span></span>
+<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a>)</span></code></pre></div>
+<div id="column-descriptions" class="section level4">
+<h4>Column Descriptions</h4>
+<table>
+<thead>
+<tr class="header">
+<th>Column</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>Data</code></td>
+<td>Reference date (last day of month, YYYY-MM-DD format)</td>
+</tr>
+<tr class="even">
+<td><code>ISPB</code></td>
+<td>8-digit code identifying the financial institution</td>
+</tr>
+<tr class="odd">
+<td><code>Nome</code></td>
+<td>Name of the PIX participant (financial institution)</td>
+</tr>
+<tr class="even">
+<td><code>NaturezaUsuario</code></td>
+<td>User type: PF (Individual) or PJ (Legal Entity)</td>
+</tr>
+<tr class="odd">
+<td><code>TipoChave</code></td>
+<td>Key type: CPF, CNPJ, Celular, e-mail, or Aleatória</td>
+</tr>
+<tr class="even">
+<td><code>qtdChaves</code></td>
+<td>Number of registered keys</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="transactions-by-municipality-transacoespixpormunicipio" class="section level3">
+<h3>2. Transactions by Municipality (TransacoesPixPorMunicipio)</h3>
+<p>Monthly transaction statistics aggregated by Brazilian municipality,
+showing transaction counts and values from both payer and receiver
+perspectives.</p>
+<p><strong>API Parameter:</strong> <code>DataBase</code> in
+<code>YYYYMM</code> format</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="co"># View available columns</span></span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="fu">pix_columns</span>(<span class="st">&quot;municipality&quot;</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a><span class="co"># Retrieve data - note: database uses YYYYMM format</span></span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>transactions <span class="ot">&lt;-</span> <span class="fu">get_pix_transactions_by_municipality</span>(<span class="at">database =</span> <span class="st">&quot;202512&quot;</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="co"># Filter by state using OData filter</span></span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>sp_data <span class="ot">&lt;-</span> <span class="fu">get_pix_transactions_by_municipality</span>(</span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>  <span class="at">database =</span> <span class="st">&quot;202512&quot;</span>,</span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a>  <span class="at">filter =</span> <span class="st">&quot;Estado eq &#39;SÃO PAULO&#39;&quot;</span></span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a>)</span></code></pre></div>
+<div id="column-descriptions-1" class="section level4">
+<h4>Column Descriptions</h4>
+<table>
+<thead>
+<tr class="header">
+<th>Column</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>AnoMes</code></td>
+<td>Reference year-month in YYYYMM format</td>
+</tr>
+<tr class="even">
+<td><code>Municipio_Ibge</code></td>
+<td>IBGE municipality code</td>
+</tr>
+<tr class="odd">
+<td><code>Municipio</code></td>
+<td>Municipality name</td>
+</tr>
+<tr class="even">
+<td><code>Estado_Ibge</code></td>
+<td>IBGE state code</td>
+</tr>
+<tr class="odd">
+<td><code>Estado</code></td>
+<td>State name</td>
+</tr>
+<tr class="even">
+<td><code>Sigla_Regiao</code></td>
+<td>Region abbreviation (NE, SE, S, CO, N)</td>
+</tr>
+<tr class="odd">
+<td><code>Regiao</code></td>
+<td>Region name (NORDESTE, SUDESTE, SUL, CENTRO-OESTE, NORTE)</td>
+</tr>
+<tr class="even">
+<td><code>VL_PagadorPF</code></td>
+<td>Total value (BRL) paid by individuals</td>
+</tr>
+<tr class="odd">
+<td><code>QT_PagadorPF</code></td>
+<td>Count of transactions with individual payers</td>
+</tr>
+<tr class="even">
+<td><code>VL_PagadorPJ</code></td>
+<td>Total value (BRL) paid by legal entities</td>
+</tr>
+<tr class="odd">
+<td><code>QT_PagadorPJ</code></td>
+<td>Count of transactions with legal entity payers</td>
+</tr>
+<tr class="even">
+<td><code>VL_RecebedorPF</code></td>
+<td>Total value (BRL) received by individuals</td>
+</tr>
+<tr class="odd">
+<td><code>QT_RecebedorPF</code></td>
+<td>Count of transactions with individual receivers</td>
+</tr>
+<tr class="even">
+<td><code>VL_RecebedorPJ</code></td>
+<td>Total value (BRL) received by legal entities</td>
+</tr>
+<tr class="odd">
+<td><code>QT_RecebedorPJ</code></td>
+<td>Count of transactions with legal entity receivers</td>
+</tr>
+<tr class="even">
+<td><code>QT_PES_PagadorPF</code></td>
+<td>Distinct individual payers</td>
+</tr>
+<tr class="odd">
+<td><code>QT_PES_PagadorPJ</code></td>
+<td>Distinct legal entity payers</td>
+</tr>
+<tr class="even">
+<td><code>QT_PES_RecebedorPF</code></td>
+<td>Distinct individual receivers</td>
+</tr>
+<tr class="odd">
+<td><code>QT_PES_RecebedorPJ</code></td>
+<td>Distinct legal entity receivers</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Note:</strong> Values are in Brazilian Real (BRL). Use
+<code>format_brl()</code> for currency formatting.</p>
+</div>
+</div>
+<div id="transaction-statistics-estatisticastransacoespix" class="section level3">
+<h3>3. Transaction Statistics (EstatisticasTransacoesPix)</h3>
+<p>Detailed statistics on PIX transactions with breakdowns by
+payer/receiver type, region, age group, initiation method, and
+transaction nature.</p>
+<p><strong>API Parameter:</strong> <code>Database</code> in
+<code>YYYYMM</code> format</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="co"># View available columns</span></span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="fu">pix_columns</span>(<span class="st">&quot;stats&quot;</span>)</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="co"># Retrieve data</span></span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>stats <span class="ot">&lt;-</span> <span class="fu">get_pix_transaction_stats</span>(<span class="at">database =</span> <span class="st">&quot;202509&quot;</span>)</span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="co"># Filter by transaction nature</span></span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a>p2p_stats <span class="ot">&lt;-</span> <span class="fu">get_pix_transaction_stats</span>(</span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a>  <span class="at">database =</span> <span class="st">&quot;202509&quot;</span>,</span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a>  <span class="at">filter =</span> <span class="st">&quot;NATUREZA eq &#39;P2P&#39;&quot;</span></span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a>)</span></code></pre></div>
+<div id="column-descriptions-2" class="section level4">
+<h4>Column Descriptions</h4>
+<table>
+<colgroup>
+<col width="38%" />
+<col width="61%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Column</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>AnoMes</code></td>
+<td>Reference year-month in YYYYMM format</td>
+</tr>
+<tr class="even">
+<td><code>PAG_PFPJ</code></td>
+<td>Payer type: PF (Individual) or PJ (Legal Entity)</td>
+</tr>
+<tr class="odd">
+<td><code>REC_PFPJ</code></td>
+<td>Receiver type: PF or PJ</td>
+</tr>
+<tr class="even">
+<td><code>PAG_REGIAO</code></td>
+<td>Payer region (NORTE, NORDESTE, SUDESTE, SUL, CENTRO-OESTE)</td>
+</tr>
+<tr class="odd">
+<td><code>REC_REGIAO</code></td>
+<td>Receiver region</td>
+</tr>
+<tr class="even">
+<td><code>PAG_IDADE</code></td>
+<td>Payer age group</td>
+</tr>
+<tr class="odd">
+<td><code>REC_IDADE</code></td>
+<td>Receiver age group</td>
+</tr>
+<tr class="even">
+<td><code>FORMAINICIACAO</code></td>
+<td>Initiation method (DICT, QRDN, QRES, MANU, INIC)</td>
+</tr>
+<tr class="odd">
+<td><code>NATUREZA</code></td>
+<td>Transaction nature (P2P, P2B, B2P, B2B, P2G, G2P)</td>
+</tr>
+<tr class="even">
+<td><code>FINALIDADE</code></td>
+<td>Transaction purpose (Pix, Pix Saque, Pix Troco)</td>
+</tr>
+<tr class="odd">
+<td><code>VALOR</code></td>
+<td>Total transaction value (BRL)</td>
+</tr>
+<tr class="even">
+<td><code>QUANTIDADE</code></td>
+<td>Number of transactions</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="transaction-nature-codes" class="section level4">
+<h4>Transaction Nature Codes</h4>
+<table>
+<thead>
+<tr class="header">
+<th>Code</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>P2P</td>
+<td>Person to Person</td>
+</tr>
+<tr class="even">
+<td>P2B</td>
+<td>Person to Business</td>
+</tr>
+<tr class="odd">
+<td>B2P</td>
+<td>Business to Person</td>
+</tr>
+<tr class="even">
+<td>B2B</td>
+<td>Business to Business</td>
+</tr>
+<tr class="odd">
+<td>P2G</td>
+<td>Person to Government</td>
+</tr>
+<tr class="even">
+<td>G2P</td>
+<td>Government to Person</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="initiation-methods" class="section level4">
+<h4>Initiation Methods</h4>
+<table>
+<thead>
+<tr class="header">
+<th>Code</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>DICT</td>
+<td>PIX Key lookup</td>
+</tr>
+<tr class="even">
+<td>QRDN</td>
+<td>Dynamic QR Code</td>
+</tr>
+<tr class="odd">
+<td>QRES</td>
+<td>Static QR Code</td>
+</tr>
+<tr class="even">
+<td>MANU</td>
+<td>Manual entry (bank details)</td>
+</tr>
+<tr class="odd">
+<td>INIC</td>
+<td>Payment Initiator</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="fraud-statistics-estatisticasfraudespix" class="section level3">
+<h3>4. Fraud Statistics (EstatisticasFraudesPix)</h3>
+<p>Statistics on PIX fraud reported through the Special Return Mechanism
+(MED - Mecanismo Especial de Devolução).</p>
+<p><strong>API Parameter:</strong> <code>Database</code> in
+<code>YYYYMM</code> format</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="co"># View available columns</span></span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="fu">pix_columns</span>(<span class="st">&quot;fraud&quot;</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="co"># Retrieve data</span></span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>fraud <span class="ot">&lt;-</span> <span class="fu">get_pix_fraud_stats</span>(<span class="at">database =</span> <span class="st">&quot;202509&quot;</span>)</span></code></pre></div>
+</div>
+</div>
+<div id="api-parameters-summary" class="section level2">
+<h2>API Parameters Summary</h2>
+<p>Each endpoint requires a specific date parameter with a specific
+format:</p>
+<table>
+<colgroup>
+<col width="24%" />
+<col width="26%" />
+<col width="19%" />
+<col width="29%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Endpoint</th>
+<th>Parameter</th>
+<th>Format</th>
+<th>R Function</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>ChavesPix</td>
+<td><code>Data</code></td>
+<td>YYYY-MM-DD</td>
+<td><code>get_pix_keys(date = &quot;2025-12-01&quot;)</code></td>
+</tr>
+<tr class="even">
+<td>TransacoesPixPorMunicipio</td>
+<td><code>DataBase</code></td>
+<td>YYYYMM</td>
+<td><code>get_pix_transactions_by_municipality(database = &quot;202512&quot;)</code></td>
+</tr>
+<tr class="odd">
+<td>EstatisticasTransacoesPix</td>
+<td><code>Database</code></td>
+<td>YYYYMM</td>
+<td><code>get_pix_transaction_stats(database = &quot;202509&quot;)</code></td>
+</tr>
+<tr class="even">
+<td>EstatisticasFraudesPix</td>
+<td><code>Database</code></td>
+<td>YYYYMM</td>
+<td><code>get_pix_fraud_stats(database = &quot;202509&quot;)</code></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="odata-filter-examples" class="section level2">
+<h2>OData Filter Examples</h2>
+<p>All functions support OData filters:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="co"># Filter by state</span></span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="fu">get_pix_transactions_by_municipality</span>(</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>  <span class="at">database =</span> <span class="st">&quot;202512&quot;</span>,</span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>  <span class="at">filter =</span> <span class="st">&quot;Estado eq &#39;SÃO PAULO&#39;&quot;</span></span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>)</span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a><span class="co"># Filter by region</span></span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a><span class="fu">get_pix_transactions_by_municipality</span>(</span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a>  <span class="at">database =</span> <span class="st">&quot;202512&quot;</span>,</span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a>  <span class="at">filter =</span> <span class="st">&quot;Sigla_Regiao eq &#39;NE&#39;&quot;</span></span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a>)</span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a></span>
+<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a><span class="co"># Filter by transaction nature</span></span>
+<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a><span class="fu">get_pix_transaction_stats</span>(</span>
+<span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a>  <span class="at">database =</span> <span class="st">&quot;202509&quot;</span>,</span>
+<span id="cb5-16"><a href="#cb5-16" tabindex="-1"></a>  <span class="at">filter =</span> <span class="st">&quot;NATUREZA eq &#39;P2P&#39;&quot;</span></span>
+<span id="cb5-17"><a href="#cb5-17" tabindex="-1"></a>)</span>
+<span id="cb5-18"><a href="#cb5-18" tabindex="-1"></a></span>
+<span id="cb5-19"><a href="#cb5-19" tabindex="-1"></a><span class="co"># Filter by key type</span></span>
+<span id="cb5-20"><a href="#cb5-20" tabindex="-1"></a><span class="fu">get_pix_keys</span>(</span>
+<span id="cb5-21"><a href="#cb5-21" tabindex="-1"></a>  <span class="at">date =</span> <span class="st">&quot;2025-12-01&quot;</span>,</span>
+<span id="cb5-22"><a href="#cb5-22" tabindex="-1"></a>  <span class="at">filter =</span> <span class="st">&quot;TipoChave eq &#39;CPF&#39;&quot;</span></span>
+<span id="cb5-23"><a href="#cb5-23" tabindex="-1"></a>)</span>
+<span id="cb5-24"><a href="#cb5-24" tabindex="-1"></a></span>
+<span id="cb5-25"><a href="#cb5-25" tabindex="-1"></a><span class="co"># Multiple filters with &#39;and&#39;</span></span>
+<span id="cb5-26"><a href="#cb5-26" tabindex="-1"></a><span class="fu">get_pix_transaction_stats</span>(</span>
+<span id="cb5-27"><a href="#cb5-27" tabindex="-1"></a>  <span class="at">database =</span> <span class="st">&quot;202509&quot;</span>,</span>
+<span id="cb5-28"><a href="#cb5-28" tabindex="-1"></a>  <span class="at">filter =</span> <span class="st">&quot;NATUREZA eq &#39;P2P&#39; and PAG_REGIAO eq &#39;SUDESTE&#39;&quot;</span></span>
+<span id="cb5-29"><a href="#cb5-29" tabindex="-1"></a>)</span>
+<span id="cb5-30"><a href="#cb5-30" tabindex="-1"></a></span>
+<span id="cb5-31"><a href="#cb5-31" tabindex="-1"></a><span class="co"># Order by column</span></span>
+<span id="cb5-32"><a href="#cb5-32" tabindex="-1"></a><span class="fu">get_pix_keys</span>(</span>
+<span id="cb5-33"><a href="#cb5-33" tabindex="-1"></a>  <span class="at">date =</span> <span class="st">&quot;2025-12-01&quot;</span>,</span>
+<span id="cb5-34"><a href="#cb5-34" tabindex="-1"></a>  <span class="at">filter =</span> <span class="st">&quot;TipoChave eq &#39;CPF&#39;&quot;</span>,</span>
+<span id="cb5-35"><a href="#cb5-35" tabindex="-1"></a>  <span class="at">orderby =</span> <span class="st">&quot;qtdChaves desc&quot;</span>,</span>
+<span id="cb5-36"><a href="#cb5-36" tabindex="-1"></a>  <span class="at">top =</span> <span class="dv">100</span></span>
+<span id="cb5-37"><a href="#cb5-37" tabindex="-1"></a>)</span></code></pre></div>
+</div>
+<div id="data-quality-notes" class="section level2">
+<h2>Data Quality Notes</h2>
+<div id="coverage" class="section level3">
+<h3>Coverage</h3>
+<ul>
+<li>Data starts from November 2020 (PIX launch)</li>
+<li>Updated monthly by the BCB</li>
+<li>Typically available with a 1-2 month lag</li>
+</ul>
+</div>
+<div id="exclusions" class="section level3">
+<h3>Exclusions</h3>
+<p>The transaction statistics do <strong>not</strong> include: -
+Transactions settled on participants’ internal books (not sent to SPI) -
+PIX scheduled for future dates - Failed or rejected transactions</p>
+</div>
+<div id="geographic-data" class="section level3">
+<h3>Geographic Data</h3>
+<p>Municipality codes follow the IBGE (Brazilian Institute of Geography
+and Statistics) standard.</p>
+</div>
+</div>
+<div id="working-with-dates" class="section level2">
+<h2>Working with Dates</h2>
+<p>The API uses different date formats for different endpoints:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="co"># ChavesPix uses YYYY-MM-DD</span></span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a><span class="fu">get_pix_keys</span>(<span class="at">date =</span> <span class="st">&quot;2025-12-01&quot;</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a><span class="co"># Other endpoints use YYYYMM</span></span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a><span class="fu">get_pix_transaction_stats</span>(<span class="at">database =</span> <span class="st">&quot;202509&quot;</span>)</span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a><span class="co"># Convert YYYYMM to Date object (first day of month)</span></span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a><span class="fu">year_month_to_date</span>(<span class="st">&quot;202312&quot;</span>)</span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a><span class="co"># [1] &quot;2023-12-01&quot;</span></span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a></span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a><span class="co"># Works with vectors</span></span>
+<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a><span class="fu">year_month_to_date</span>(<span class="fu">c</span>(<span class="st">&quot;202301&quot;</span>, <span class="st">&quot;202306&quot;</span>, <span class="st">&quot;202312&quot;</span>))</span>
+<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a><span class="co"># [1] &quot;2023-01-01&quot; &quot;2023-06-01&quot; &quot;2023-12-01&quot;</span></span></code></pre></div>
+</div>
+<div id="currency-formatting" class="section level2">
+<h2>Currency Formatting</h2>
+<p>Format values as Brazilian Real:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="co"># Format as BRL</span></span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a><span class="fu">format_brl</span>(<span class="fl">1234567.89</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a><span class="co"># [1] &quot;R$ 1.234.567,89&quot;</span></span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a><span class="co"># Without prefix</span></span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a><span class="fu">format_brl</span>(<span class="fl">1234567.89</span>, <span class="at">prefix =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a><span class="co"># [1] &quot;1.234.567,89&quot;</span></span></code></pre></div>
+</div>
+<div id="understanding-participant-identifiers" class="section level2">
+<h2>Understanding Participant Identifiers</h2>
+<p>Financial institutions in Brazil are identified by their
+<strong>ISPB</strong> (Identificador do Sistema de Pagamentos
+Brasileiro), an 8-digit code. Major banks include:</p>
+<table>
+<thead>
+<tr class="header">
+<th>ISPB</th>
+<th>Institution</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>00000000</td>
+<td>Banco do Brasil</td>
+</tr>
+<tr class="even">
+<td>60701190</td>
+<td>Itaú Unibanco</td>
+</tr>
+<tr class="odd">
+<td>60746948</td>
+<td>Bradesco</td>
+</tr>
+<tr class="even">
+<td>90400888</td>
+<td>Santander</td>
+</tr>
+<tr class="odd">
+<td>18236120</td>
+<td>Nu Pagamentos (Nubank)</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="co"># Filter by institution name</span></span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>bb_keys <span class="ot">&lt;-</span> <span class="fu">get_pix_keys</span>(</span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>  <span class="at">date =</span> <span class="st">&quot;2025-12-01&quot;</span>,</span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>  <span class="at">filter =</span> <span class="st">&quot;contains(Nome, &#39;BANCO DO BRASIL&#39;)&quot;</span></span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>)</span></code></pre></div>
+</div>
+<div id="see-also" class="section level2">
+<h2>See Also</h2>
+<ul>
+<li><a href="odata-queries.html">Working with OData Queries</a> -
+Advanced query techniques with filters</li>
+<li><a href="analysis-examples.html">Data Analysis Examples</a> -
+Practical examples</li>
+</ul>
+</div>
+<div id="references" class="section level2">
+<h2>References</h2>
+<ul>
+<li><a href="https://www.bcb.gov.br/estabilidadefinanceira/pix">PIX
+Official Regulations</a></li>
+<li><a href="https://www.bcb.gov.br/content/estabilidadefinanceira/pix/API-DICT.html">DICT
+API Documentation</a></li>
+<li><a href="https://www.bcb.gov.br/estabilidadefinanceira/comunicacaodados">SPI
+Technical Documentation</a></li>
+<li><a href="https://dadosabertos.bcb.gov.br/dataset/pix">BCB PIX Open
+Data Portal</a></li>
+</ul>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
