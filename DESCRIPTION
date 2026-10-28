@@ -1,18 +1,25 @@
 Package: pixr
 Title: Access Brazilian Central Bank 'PIX' Open Data 'API'
-Version: 0.1.0
+Version: 0.1.1
 Authors@R: c(
-    person("Andre", "Leite", email = "leite@castlab.org", role = c("aut", "cre")),
-    person("Marcos", "Wasilew", email = "marcos.wasilew@gmail.com", role = "aut"),
-    person("Hugo", "Vasconcelos", email = "hugo.vasconcelos@ufpe.br", role = "aut"),
-    person("Diogo", "Bezerra", email = "diogo.bezerra@ufpe.br", role = "aut"))
+    person("André", "Leite", email = "leite@castlab.org", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0002-4718-9766")),
+    person("Marcos", "Wasiliew", email = "marcos.wasiliew@gmail.com", role = "aut",
+           comment = c(ORCID = "0009-0004-4694-3159")),
+    person("Hugo", "Vasconcelos", email = "hugo.vasconcelos@ufpe.br", role = "aut",
+           comment = c(ORCID = "0000-0001-6249-0920")),
+    person("Carlos", "Amorim", email = "carlos.agaf@ufpe.br", role = "aut",
+           comment = c(ORCID = "0000-0001-6315-8305")),
+    person("Diogo", "Bezerra", email = "diogo.bezerra@ufpe.br", role = "aut",
+           comment = c(ORCID = "0000-0002-1216-8674")),
+    person("Júlia", "Nascimento Barreto", email = "juliabarreto@gd.seplag.pe.gov.br", role = "aut",
+           comment = c(ORCID = "0009-0004-2851-7770")))
 Description: Provides a 'tidyverse'-style interface to the Brazilian Central Bank (<https://www.bcb.gov.br>) 'PIX' Open Data 'API' <https://olinda.bcb.gov.br/olinda/servico/Pix_DadosAbertos/versao/v1/aplicacao#!/recursos>. 
     Retrieve statistics on 'PIX' keys, transactions by municipality, and monthly 
     transaction summaries. All functions return 'tibbles' and support 'OData' 
     query parameters for filtering, selecting, and ordering data.
 License: MIT + file LICENSE
 Encoding: UTF-8
-RoxygenNote: 7.3.3
 Depends: R (>= 4.1.0)
 Imports: httr2 (>= 1.0.0), cli (>= 3.6.0), tibble (>= 3.2.0), dplyr (>=
         1.1.0), rlang (>= 1.1.0), purrr (>= 1.0.0)
@@ -20,14 +27,20 @@ Suggests: testthat (>= 3.0.0), withr, knitr, rmarkdown, ggplot2,
         scales, forcats, tidyr
 VignetteBuilder: knitr
 Config/testthat/edition: 3
-URL: https://github.com/StrategicProjects/pixr
+Language: en-US
+URL: https://github.com/StrategicProjects/pixr,
+        https://strategicprojects.github.io/pixr/
 BugReports: https://github.com/StrategicProjects/pixr/issues
+Config/roxygen2/version: 8.0.0
 NeedsCompilation: no
-Packaged: 2026-01-27 13:48:38 UTC; leite
-Author: Andre Leite [aut, cre],
-  Marcos Wasilew [aut],
-  Hugo Vasconcelos [aut],
-  Diogo Bezerra [aut]
-Maintainer: Andre Leite <leite@castlab.org>
+Packaged: 2026-10-28 21:12:21 UTC; leite
+Author: André Leite [aut, cre] (ORCID: <https://orcid.org/0000-0002-4718-9766>),
+  Marcos Wasiliew [aut] (ORCID: <https://orcid.org/0009-0004-4694-3159>),
+  Hugo Vasconcelos [aut] (ORCID: <https://orcid.org/0000-0001-6249-0920>),
+  Carlos Amorim [aut] (ORCID: <https://orcid.org/0000-0001-6315-8305>),
+  Diogo Bezerra [aut] (ORCID: <https://orcid.org/0000-0002-1216-8674>),
+  Júlia Nascimento Barreto [aut] (ORCID:
+    <https://orcid.org/0009-0004-2851-7770>)
+Maintainer: André Leite <leite@castlab.org>
 Repository: CRAN
-Date/Publication: 2026-01-31 19:00:08 UTC
+Date/Publication: 2026-10-28 21:30:02 UTC
